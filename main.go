@@ -6,6 +6,7 @@ import (
 
 	apiRoutes "goshaka/app/routes"
 	appConfig "goshaka/configs"
+	appDatabase "goshaka/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -24,6 +25,10 @@ func getEnv(key string) string {
 func main() {
 	app := fiber.New()
 	port := appConfig.GetEnv("PORT")
+
+	//Database
+	appDatabase.Connect()
+
 	//Router
 	apiRoutes.MainRoutes(app)
 	apiRoutes.ApiRoutes(app)

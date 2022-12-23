@@ -19,4 +19,5 @@ func ApiRoutes(app *fiber.App) {
 	apiV1 := app.Group("/api/v1", logger.New())
 
 	routeV1.IndexRoute(apiV1)
+	routeV1.NoteRoute(apiV1)
 }
