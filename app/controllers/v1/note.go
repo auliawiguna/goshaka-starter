@@ -36,3 +36,17 @@ func Show(c *fiber.Ctx) error {
 		"data":  note,
 	})
 }
+
+func Store(c *fiber.Ctx) error {
+	note, err := repositories_v1.Create(c)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": true,
+			"data":  err,
+		})
+	}
+	return c.JSON(fiber.Map{
+		"error": false,
+		"data":  note,
+	})
+}

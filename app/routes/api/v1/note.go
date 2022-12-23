@@ -11,4 +11,5 @@ func NoteRoute(router fiber.Router) {
 
 	note.Get("/", controllerV1.Index)
 	note.Get("/:id", controllerV1.Show)
+	note.Post("/", controllerV1.Store)
 }
