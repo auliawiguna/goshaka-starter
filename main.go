@@ -1,23 +1,31 @@
 package main
 
 import (
+	appMiddleware "goshaka/app/middlewares"
 	apiRoutes "goshaka/app/routes"
 	appConfig "goshaka/configs"
 	appDatabase "goshaka/database"
+	appHelper "goshaka/helpers"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
 	app := fiber.New()
-	port := appConfig.GetEnv("PORT")
 
 	//Database
 	appDatabase.Connect()
+
+	//Apply default middleware
+	appMiddleware.DefaultMiddleware(app)
 
 	//Router
 	apiRoutes.MainRoutes(app)
 	apiRoutes.ApiRoutes(app)
 
-	app.Listen(":" + port)
+	if appConfig.GetEnv("ENV") == "dev" {
+		appHelper.StartServer(app)
+	} else {
+		appHelper.StartServerWithGracefulShutdown(app)
+	}
 }
