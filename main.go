@@ -10,6 +10,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// @title Goshaka Golang API Starter
+// @version 1.0
+// @Description This is a API boilerplate using Golang
+// @contact.name Aulia Wiguna
+// @contact.url https://github.com/auliawiguna/
+// @contact.email wigunaahmadaulia@gmail.com
+// @host 127.0.0.1:3000
+// @BasePath /
+// @schemas http
 func main() {
 	app := fiber.New()
 

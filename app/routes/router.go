@@ -20,4 +20,5 @@ func ApiRoutes(app *fiber.App) {
 
 	routeV1.IndexRoute(apiV1)
 	routeV1.NoteRoute(apiV1)
+	routeV1.SwaggerRoute(apiV1)
 }

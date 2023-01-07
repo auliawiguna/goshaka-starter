@@ -1,0 +1,166 @@
+basePath: /
+definitions:
+  structs.NoteCreate:
+    properties:
+      subtitle:
+        type: string
+      text:
+        type: string
+      title:
+        type: string
+    type: object
+host: 127.0.0.1:3000
+info:
+  contact:
+    email: wigunaahmadaulia@gmail.com
+    name: Aulia Wiguna
+    url: https://github.com/auliawiguna/
+  description: This is a API boilerplate using Golang
+  title: Goshaka Golang API Starter
+  version: "1.0"
+paths:
+  /api/v1:
+    get:
+      consumes:
+      - application/json
+      description: Show greeting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Say hi
+      tags:
+      - Root
+  /api/v1/notes:
+    get:
+      consumes:
+      - application/json
+      description: Show notes
+      parameters:
+      - default: 10
+        description: Default 10
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Default 10
+        in: query
+        name: page
+        type: integer
+      - description: Sorting
+        enum:
+        - ID asc
+        - ID desc
+        - title asc
+        - title desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Show notes
+      tags:
+      - Notes
+    post:
+      consumes:
+      - application/json
+      description: Create new note
+      parameters:
+      - description: title
+        in: body
+        name: notesRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.NoteCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create new note
+      tags:
+      - Notes
+  /api/v1/notes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing note
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete existing note
+      tags:
+      - Notes
+    get:
+      consumes:
+      - application/json
+      description: Show detail note
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Show detail note
+      tags:
+      - Notes
+    put:
+      consumes:
+      - application/json
+      description: Update existing note
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      - description: title
+        in: body
+        name: notesRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.NoteCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update existing note
+      tags:
+      - Notes
+swagger: "2.0"
