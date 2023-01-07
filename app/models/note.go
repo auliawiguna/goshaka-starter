@@ -8,7 +8,7 @@ import (
 
 type Note struct {
 	gorm.Model
-	ID        uint      `gorm:"primaryKey" json:"id"`
+	ID        uint      `gorm:"primaryKey"`
 	Title     string    `json:"title"`
 	SubTitle  string    `json:"subtitle"`
 	Text      string    `json:"text"`

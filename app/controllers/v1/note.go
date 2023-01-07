@@ -6,8 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Index(c *fiber.Ctx) error {
-	notes, err := repositories_v1.ShowAll()
+func NoteIndex(c *fiber.Ctx) error {
+	notes, err := repositories_v1.NoteShowAll()
 
 	if len(notes) == 0 {
 		return c.Status(404).JSON(fiber.Map{
@@ -22,8 +22,8 @@ func Index(c *fiber.Ctx) error {
 	})
 }
 
-func Show(c *fiber.Ctx) error {
-	note := repositories_v1.Show(c.Params("id"))
+func NoteShow(c *fiber.Ctx) error {
+	note := repositories_v1.NoteShow(c.Params("id"))
 
 	if note.ID == 0 {
 		return c.Status(404).JSON(fiber.Map{
@@ -37,8 +37,38 @@ func Show(c *fiber.Ctx) error {
 	})
 }
 
-func Store(c *fiber.Ctx) error {
-	note, err := repositories_v1.Create(c)
+func NoteStore(c *fiber.Ctx) error {
+	note, err := repositories_v1.NoteCreate(c)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": true,
+			"data":  err,
+		})
+	}
+	return c.JSON(fiber.Map{
+		"error": false,
+		"data":  note,
+	})
+}
+
+func NoteUpdate(c *fiber.Ctx) error {
+	id := c.Params("id")
+	note, err := repositories_v1.NoteUpdate(c, id)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": true,
+			"data":  err,
+		})
+	}
+	return c.JSON(fiber.Map{
+		"error": false,
+		"data":  note,
+	})
+}
+
+func NoteDestroy(c *fiber.Ctx) error {
+	id := c.Params("id")
+	note, err := repositories_v1.NoteDestroy(c, id)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": true,

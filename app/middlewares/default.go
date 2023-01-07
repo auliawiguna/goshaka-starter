@@ -14,5 +14,9 @@ func DefaultMiddleware(a *fiber.App) {
 		compress.New(compress.Config{
 			Level: compress.LevelBestSpeed,
 		}),
+		func(c *fiber.Ctx) error {
+			//Custom middleware here
+			return c.Next()
+		},
 	)
 }
