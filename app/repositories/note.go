@@ -3,22 +3,27 @@ package repositories_v1
 import (
 	"fmt"
 	"goshaka/app/models"
+	"goshaka/app/models/scopes"
 	"goshaka/database"
+	"goshaka/helpers"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func NoteShowAll() ([]models.Note, bool) {
+func NoteShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
 	db := database.DB
-	var notes []models.Note
+	var notes []*models.Note
 	var error bool = false
 
-	db.Find(&notes)
-	if len(notes) == 0 {
-		error = true
-	}
+	db.Scopes(scopes.Paginate(notes, &pagination, db)).Find(&notes)
+	pagination.Rows = notes
 
-	return notes, error
+	// db.Find(&notes)
+	// if len(notes) == 0 {
+	// 	error = true
+	// }
+
+	return &pagination, error
 }
 
 func NoteShow(id string) models.Note {

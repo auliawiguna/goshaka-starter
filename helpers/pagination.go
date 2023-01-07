@@ -23,7 +23,7 @@ func (p *Pagination) GetLimit() int {
 
 func (p *Pagination) GetPage() int {
 	if p.Page == 0 {
-		p.Page = 10
+		p.Page = 1
 	}
 
 	return p.Page

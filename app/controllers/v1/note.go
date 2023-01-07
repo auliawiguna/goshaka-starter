@@ -2,19 +2,25 @@ package controller_v1
 
 import (
 	repositories_v1 "goshaka/app/repositories"
+	"goshaka/helpers"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func NoteIndex(c *fiber.Ctx) error {
-	notes, err := repositories_v1.NoteShowAll()
+	var pagination helpers.Pagination
+	pagination.Limit, _ = strconv.Atoi(c.Query("limit"))
+	pagination.Page, _ = strconv.Atoi(c.Query("page"))
+	pagination.Sort = c.Query("sort")
+	notes, err := repositories_v1.NoteShowAll(pagination)
 
-	if len(notes) == 0 {
-		return c.Status(404).JSON(fiber.Map{
-			"error": err,
-			"data":  nil,
-		})
-	}
+	// if len(notes) == 0 {
+	// 	return c.Status(404).JSON(fiber.Map{
+	// 		"error": err,
+	// 		"data":  nil,
+	// 	})
+	// }
 
 	return c.JSON(fiber.Map{
 		"error": err,
