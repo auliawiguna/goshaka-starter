@@ -15,13 +15,6 @@ func NoteIndex(c *fiber.Ctx) error {
 	pagination.Sort = c.Query("sort")
 	notes, err := repositories_v1.NoteShowAll(pagination)
 
-	// if len(notes) == 0 {
-	// 	return c.Status(404).JSON(fiber.Map{
-	// 		"error": err,
-	// 		"data":  nil,
-	// 	})
-	// }
-
 	return c.JSON(fiber.Map{
 		"error": err,
 		"data":  notes,
