@@ -5,7 +5,7 @@ Inspired by [Fiber backend template for Create Go App CLI](https://github.com/cr
 - [Linux] Install `swag` by execute `go install github.com/swaggo/swag/cmd/swag@latest`
 - Generate swagger docs by execute `make swagger`
 
-## Feature
+## Features
 - Login
 - Logout
 - Register
@@ -17,10 +17,10 @@ Inspired by [Fiber backend template for Create Go App CLI](https://github.com/cr
 - Example of CRUD function
 - Verification on email change
 
-## Capability
+## Capabilities
 - Auto migration
 - Auto seeder
 
-## Security Rule
+## Security Rules
 - In this boilerplate, we use stateless JWT
 - To change your email address, you need to verify the changes via email
