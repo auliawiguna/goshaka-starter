@@ -7,9 +7,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func CreateNoteValidator(c *fiber.Ctx) error {
+func LoginValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
-	body := new(structs.NoteCreate)
+	body := new(structs.Login)
 	c.BodyParser(&body)
 
 	err := Validator.Struct(body)

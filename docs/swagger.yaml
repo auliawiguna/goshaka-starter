@@ -1,5 +1,15 @@
 basePath: /
 definitions:
+  structs.Login:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   structs.NoteCreate:
     properties:
       subtitle:
@@ -8,6 +18,10 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - subtitle
+    - text
+    - title
     type: object
 host: 127.0.0.1:3000
 info:
@@ -35,6 +49,29 @@ paths:
       summary: Say hi
       tags:
       - Root
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      parameters:
+      - description: email
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login
+      tags:
+      - Auth
   /api/v1/notes:
     get:
       consumes:
