@@ -1,9 +1,11 @@
 package database
 
 import (
+	"errors"
 	model "goshaka/app/models"
 	appConfig "goshaka/configs"
 	appHelper "goshaka/helpers"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -34,6 +36,16 @@ func Connect() error {
 	}
 
 	DB.AutoMigrate(&model.Note{})
+	if err = DB.AutoMigrate(&model.User{}); err == nil && DB.Migrator().HasTable(&model.User{}) {
+		if err := DB.First(&model.User{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			DB.Create(&model.User{
+				Username:    "aulia",
+				Email:       "aulia@goshaka.id",
+				Password:    "shaka321",
+				ValidatedAt: time.Date(2023, 1, 1, 10, 10, 10, 0, time.UTC),
+			})
+		}
+	}
 
 	return nil
 }

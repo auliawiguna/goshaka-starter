@@ -18,11 +18,6 @@ func NoteShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
 	db.Scopes(scopes.Paginate(notes, &pagination, db)).Find(&notes)
 	pagination.Rows = notes
 
-	// db.Find(&notes)
-	// if len(notes) == 0 {
-	// 	error = true
-	// }
-
 	return &pagination, error
 }
 
