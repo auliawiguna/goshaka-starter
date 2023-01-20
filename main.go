@@ -19,6 +19,9 @@ import (
 // @host 127.0.0.1:3000
 // @BasePath /
 // @schemas http
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	app := fiber.New()
 

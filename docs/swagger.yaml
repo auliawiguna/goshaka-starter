@@ -200,4 +200,27 @@ paths:
       summary: Update existing note
       tags:
       - Notes
+  /api/v1/protected:
+    get:
+      consumes:
+      - application/json
+      description: Show greeting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Say hi
+      tags:
+      - Root
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
