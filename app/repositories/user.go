@@ -33,7 +33,7 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	password := sanitise.Sanitize(loginStructure.Password)
 
 	db := database.DB
-	db.Find(&user, "email = ?", email)
+	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
 
 	errHash := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 
@@ -46,6 +46,7 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["username"] = user.Username
+	claims["id"] = user.ID
 	claims["email"] = user.Email
 	claims["exp"] = time.Now().Add(time.Hour * 24 * 30).Unix()
 

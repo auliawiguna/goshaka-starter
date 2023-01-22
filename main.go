@@ -12,7 +12,7 @@ import (
 
 // @title Goshaka Golang API Starter
 // @version 1.0
-// @Description This is a API boilerplate using Golang
+// @Description This is an API boilerplate using Golang
 // @contact.name Aulia Wiguna
 // @contact.url https://github.com/auliawiguna/
 // @contact.email wigunaahmadaulia@gmail.com

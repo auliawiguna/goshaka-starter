@@ -42,7 +42,7 @@ info:
     email: wigunaahmadaulia@gmail.com
     name: Aulia Wiguna
     url: https://github.com/auliawiguna/
-  description: This is a API boilerplate using Golang
+  description: This is an API boilerplate using Golang
   title: Goshaka Golang API Starter
   version: "1.0"
 paths:

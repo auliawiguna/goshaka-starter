@@ -2,6 +2,7 @@ package controller_v1
 
 import (
 	repositories_v1 "goshaka/app/repositories"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -24,6 +25,14 @@ func Login(c *fiber.Ctx) error {
 			"data":  err,
 		})
 	}
+	c.Cookie(&fiber.Cookie{
+		Name:  "token",
+		Value: jwt,
+	})
+	c.Cookie(&fiber.Cookie{
+		Name:  "user_id",
+		Value: strconv.FormatUint(uint64(user.ID), 10),
+	})
 
 	return c.Status(200).JSON(fiber.Map{
 		"error":        false,

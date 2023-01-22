@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a API boilerplate using Golang",
+        "description": "This is an API boilerplate using Golang",
         "title": "Goshaka Golang API Starter",
         "contact": {
             "name": "Aulia Wiguna",

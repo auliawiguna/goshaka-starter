@@ -583,7 +583,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Goshaka Golang API Starter",
-	Description:      "This is a API boilerplate using Golang",
+	Description:      "This is an API boilerplate using Golang",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
