@@ -26,3 +26,6 @@ Inspired by [Fiber backend template for Create Go App CLI](https://github.com/cr
 ## Security Rules
 - In this boilerplate, we use stateless JWT
 - To change your email address, you need to verify the changes via email
+
+## Screenshots
+![image](https://user-images.githubusercontent.com/26473549/213926419-3d2d4b53-3060-48e6-9c26-ebb86c0466b2.png)
