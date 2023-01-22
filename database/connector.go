@@ -117,6 +117,7 @@ func Connect() error {
 			}
 		}
 	}
+	DB.AutoMigrate(&model.UserToken{})
 
 	return nil
 }
