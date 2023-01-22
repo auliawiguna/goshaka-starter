@@ -13,8 +13,8 @@ func RoleRoute(router fiber.Router) {
 	note := router.Group("/roles")
 
 	note.Get("/", middlewares.ValidateJWT, middlewares.PermissionAuth([]string{"role-read"}), controllerV1.RoleIndex)
-	note.Get("/:id", middlewares.ValidateJWT, controllerV1.RoleShow)
-	note.Post("/", middlewares.ValidateJWT, validator.CreateRoleValidator, controllerV1.RoleStore)
-	note.Put("/:id", middlewares.ValidateJWT, controllerV1.RoleUpdate)
-	note.Delete("/:id", middlewares.ValidateJWT, controllerV1.RoleDestroy)
+	note.Get("/:id", middlewares.ValidateJWT, middlewares.PermissionAuth([]string{"role-read"}), controllerV1.RoleShow)
+	note.Post("/", middlewares.ValidateJWT, middlewares.PermissionAuth([]string{"role-create"}), validator.CreateRoleValidator, controllerV1.RoleStore)
+	note.Put("/:id", middlewares.ValidateJWT, middlewares.PermissionAuth([]string{"role-update"}), controllerV1.RoleUpdate)
+	note.Delete("/:id", middlewares.ValidateJWT, middlewares.PermissionAuth([]string{"role-delete"}), controllerV1.RoleDestroy)
 }

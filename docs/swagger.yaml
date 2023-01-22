@@ -23,6 +23,16 @@ definitions:
     - text
     - title
     type: object
+  structs.PermissionCreate:
+    properties:
+      display:
+        type: string
+      name:
+        type: string
+    required:
+    - display
+    - name
+    type: object
   structs.RoleCreate:
     properties:
       display:
@@ -228,6 +238,144 @@ paths:
       summary: Update existing note
       tags:
       - Notes
+  /api/v1/permissions:
+    get:
+      consumes:
+      - application/json
+      description: Show permissions
+      parameters:
+      - default: 10
+        description: Default 10
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Default 10
+        in: query
+        name: page
+        type: integer
+      - description: Sorting
+        enum:
+        - ID asc
+        - ID desc
+        - title asc
+        - title desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show permissions
+      tags:
+      - Permissions
+    post:
+      consumes:
+      - application/json
+      description: Create new permission
+      parameters:
+      - description: title
+        in: body
+        name: permissionsRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.PermissionCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create new permission
+      tags:
+      - Permissions
+  /api/v1/permissions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing permission
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete existing permission
+      tags:
+      - Permissions
+    get:
+      consumes:
+      - application/json
+      description: Show detail permission
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show detail permission
+      tags:
+      - Permissions
+    put:
+      consumes:
+      - application/json
+      description: Update existing permission
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      - description: title
+        in: body
+        name: permissionsRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.PermissionCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update existing permission
+      tags:
+      - Permissions
   /api/v1/protected:
     get:
       consumes:
