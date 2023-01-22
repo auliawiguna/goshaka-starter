@@ -550,18 +550,14 @@ const docTemplate = `{
         "structs.RoleCreate": {
             "type": "object",
             "required": [
-                "subtitle",
-                "text",
-                "title"
+                "display",
+                "name"
             ],
             "properties": {
-                "subtitle": {
+                "display": {
                     "type": "string"
                 },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
+                "name": {
                     "type": "string"
                 }
             }

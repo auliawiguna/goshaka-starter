@@ -25,16 +25,13 @@ definitions:
     type: object
   structs.RoleCreate:
     properties:
-      subtitle:
+      display:
         type: string
-      text:
-        type: string
-      title:
+      name:
         type: string
     required:
-    - subtitle
-    - text
-    - title
+    - display
+    - name
     type: object
 host: 127.0.0.1:3000
 info:
