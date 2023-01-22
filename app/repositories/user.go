@@ -16,6 +16,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func UserShow(id string) models.User {
+	db := database.DB
+	var user models.User
+
+	db.Preload("RoleUser.Role").Find(&user, "id = ?", id)
+
+	return user
+}
+
 func Login(c *fiber.Ctx) (models.User, string, error) {
 	sanitise := bluemonday.UGCPolicy()
 

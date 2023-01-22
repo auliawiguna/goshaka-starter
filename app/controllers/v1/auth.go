@@ -1,6 +1,7 @@
 package controller_v1
 
 import (
+	"fmt"
 	repositories_v1 "goshaka/app/repositories"
 	"strconv"
 
@@ -39,4 +40,29 @@ func Login(c *fiber.Ctx) error {
 		"user":         user,
 		"access_token": jwt,
 	})
+}
+
+// @Security BearerAuth
+// @Summary My Profile
+// @Description My Profile
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /api/v1/auth/my-profile [get]
+func MyProfile(c *fiber.Ctx) error {
+	userId := c.Locals("user_id")
+	user := repositories_v1.UserShow(fmt.Sprintf("%f", userId))
+
+	if user.ID == 0 {
+		return c.Status(404).JSON(fiber.Map{
+			"error": true,
+			"data":  nil,
+		})
+	}
+	return c.Status(404).JSON(fiber.Map{
+		"error": false,
+		"data":  user,
+	})
+
 }
