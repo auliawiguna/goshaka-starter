@@ -23,6 +23,19 @@ definitions:
     - text
     - title
     type: object
+  structs.RoleCreate:
+    properties:
+      subtitle:
+        type: string
+      text:
+        type: string
+      title:
+        type: string
+    required:
+    - subtitle
+    - text
+    - title
+    type: object
 host: 127.0.0.1:3000
 info:
   contact:
@@ -218,6 +231,144 @@ paths:
       summary: Say hi
       tags:
       - Root
+  /api/v1/roles:
+    get:
+      consumes:
+      - application/json
+      description: Show roles
+      parameters:
+      - default: 10
+        description: Default 10
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Default 10
+        in: query
+        name: page
+        type: integer
+      - description: Sorting
+        enum:
+        - ID asc
+        - ID desc
+        - title asc
+        - title desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: Create new role
+      parameters:
+      - description: title
+        in: body
+        name: rolesRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.RoleCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create new role
+      tags:
+      - Roles
+  /api/v1/roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing role
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete existing role
+      tags:
+      - Roles
+    get:
+      consumes:
+      - application/json
+      description: Show detail role
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show detail role
+      tags:
+      - Roles
+    put:
+      consumes:
+      - application/json
+      description: Update existing role
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      - description: title
+        in: body
+        name: rolesRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.RoleCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update existing role
+      tags:
+      - Roles
 securityDefinitions:
   BearerAuth:
     in: header
