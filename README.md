@@ -7,7 +7,6 @@ Inspired by [Fiber backend template for Create Go App CLI](https://github.com/cr
 
 ## Features
 - Login
-- Logout
 - Register
 - Verify Registration
 - Reset Password

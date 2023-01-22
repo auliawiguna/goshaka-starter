@@ -46,6 +46,64 @@ func Connect() error {
 			})
 		}
 	}
+	if err = DB.AutoMigrate(&model.Role{}); err == nil && DB.Migrator().HasTable(&model.Role{}) {
+		if err := DB.First(&model.Role{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			DB.Create(&model.Role{
+				Name:    "admin",
+				Display: "Super Admin (Developer)",
+			})
+		}
+	}
+	if err = DB.AutoMigrate(&model.Permission{}); err == nil && DB.Migrator().HasTable(&model.Permission{}) {
+		if err := DB.First(&model.Permission{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			var permissions = []model.Permission{{
+				Name:    "role-create",
+				Display: "Create role",
+			}, {
+				Name:    "role-read",
+				Display: "Index role",
+			}, {
+				Name:    "role-update",
+				Display: "Update role",
+			}, {
+				Name:    "role-delete",
+				Display: "Delete role",
+			}, {
+				Name:    "permission-create",
+				Display: "Create permission",
+			}, {
+				Name:    "permission-read",
+				Display: "Index permission",
+			}, {
+				Name:    "permission-update",
+				Display: "Update permission",
+			}, {
+				Name:    "permission-delete",
+				Display: "Delete permission",
+			}, {
+				Name:    "user-create",
+				Display: "Create User",
+			}, {
+				Name:    "user-read",
+				Display: "Index User",
+			}, {
+				Name:    "user-update",
+				Display: "Update User",
+			}, {
+				Name:    "user-delete",
+				Display: "Delete User",
+			}}
+			DB.Create(&permissions)
+		}
+	}
+	if err = DB.AutoMigrate(&model.UserRole{}); err == nil && DB.Migrator().HasTable(&model.UserRole{}) {
+		if err := DB.First(&model.UserRole{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			DB.Create(&model.UserRole{
+				UserId: 1,
+				RoleId: 1,
+			})
+		}
+	}
 
 	return nil
 }
