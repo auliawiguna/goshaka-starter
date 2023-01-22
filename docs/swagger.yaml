@@ -43,6 +43,27 @@ definitions:
     - display
     - name
     type: object
+  structs.UserCreate:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      password_confirmation:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - first_name
+    - password
+    - password_confirmation
+    - username
+    type: object
 host: 127.0.0.1:3000
 info:
   contact:
@@ -108,6 +129,29 @@ paths:
       security:
       - BearerAuth: []
       summary: My Profile
+      tags:
+      - Auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register
+      parameters:
+      - description: email
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.UserCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register
       tags:
       - Auth
   /api/v1/notes:

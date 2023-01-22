@@ -48,10 +48,14 @@ func Connect() error {
 	}
 	if err = DB.AutoMigrate(&model.Role{}); err == nil && DB.Migrator().HasTable(&model.Role{}) {
 		if err := DB.First(&model.Role{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-			DB.Create(&model.Role{
+			var roles = []model.Role{{
 				Name:    "admin",
 				Display: "Super Admin (Developer)",
-			})
+			}, {
+				Name:    "user",
+				Display: "User",
+			}}
+			DB.Create(&roles)
 		}
 	}
 	if err = DB.AutoMigrate(&model.Permission{}); err == nil && DB.Migrator().HasTable(&model.Permission{}) {

@@ -12,6 +12,8 @@ type User struct {
 	ID          uint   `gorm:"primaryKey" json:"id"`
 	Username    string `gorm:"size:50;not null;unique" json:"username"`
 	Email       string `gorm:"size:150;not null;unique" json:"email"`
+	FirstName   string `gorm:"size:150;not null" json:"first_name"`
+	LastName    string `gorm:"size:150" json:"last_name"`
 	Password    string `gorm:"size:150;not null" json:"password"`
 	RoleUser    []RoleUser
 	ValidatedAt time.Time `json:"validated_at"`

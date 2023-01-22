@@ -69,3 +69,41 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 
 	return user, tokenString, nil
 }
+
+func Register(c *fiber.Ctx) (models.User, error) {
+	sanitise := bluemonday.UGCPolicy()
+
+	var user models.User
+	var userCreateStructure structs.UserCreate
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &userCreateStructure)
+
+	if err != nil {
+		return user, fmt.Errorf("payload error")
+	}
+	email := sanitise.Sanitize(userCreateStructure.Email)
+	password := sanitise.Sanitize(userCreateStructure.Password)
+	first_name := sanitise.Sanitize(userCreateStructure.FirstName)
+	last_name := sanitise.Sanitize(userCreateStructure.LastName)
+
+	db := database.DB
+
+	//Set User
+	db.Create(&models.User{
+		FirstName: first_name,
+		LastName:  last_name,
+		Password:  password,
+		Email:     email,
+	})
+
+	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
+	//Set Role
+	db.Create(&models.RoleUser{
+		UserId: user.ID,
+		RoleId: 1,
+	})
+
+	return user, nil
+}

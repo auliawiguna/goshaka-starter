@@ -42,6 +42,31 @@ func Login(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Register new account
+// @Description Register new account
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	loginRequest	body	structs.UserCreate	true	"email"
+// @Router /api/v1/auth/register [post]
+func Register(c *fiber.Ctx) error {
+	user, err := repositories_v1.Register(c)
+
+	if err != nil {
+		return c.Status(401).JSON(fiber.Map{
+			"error": true,
+			"user":  user,
+			"data":  err,
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"error": false,
+		"user":  user,
+	})
+}
+
 // @Security BearerAuth
 // @Summary My Profile
 // @Description My Profile
