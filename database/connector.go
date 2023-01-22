@@ -96,12 +96,25 @@ func Connect() error {
 			DB.Create(&permissions)
 		}
 	}
-	if err = DB.AutoMigrate(&model.UserRole{}); err == nil && DB.Migrator().HasTable(&model.UserRole{}) {
-		if err := DB.First(&model.UserRole{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-			DB.Create(&model.UserRole{
+	if err = DB.AutoMigrate(&model.RoleUser{}); err == nil && DB.Migrator().HasTable(&model.RoleUser{}) {
+		if err := DB.First(&model.RoleUser{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			DB.Create(&model.RoleUser{
 				UserId: 1,
 				RoleId: 1,
 			})
+		}
+	}
+	if err = DB.AutoMigrate(&model.PermissionRole{}); err == nil && DB.Migrator().HasTable(&model.PermissionRole{}) {
+		if err := DB.First(&model.PermissionRole{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			var permissions []*model.Permission
+			DB.Find(&permissions)
+			for _, p := range permissions {
+				DB.Create(&model.PermissionRole{
+					PermissionId: p.ID,
+					RoleId:       1,
+				})
+
+			}
 		}
 	}
 

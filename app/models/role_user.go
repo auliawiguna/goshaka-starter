@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRole struct {
+type RoleUser struct {
 	gorm.Model
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	UserId    uint      `gorm:"not null" json:"user_id"`
@@ -17,6 +17,6 @@ type UserRole struct {
 	Role      Role      `gorm:"foreignKey:RoleId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
-func (u UserRole) TableName() string {
-	return "user_role"
+func (u RoleUser) TableName() string {
+	return "role_user"
 }
