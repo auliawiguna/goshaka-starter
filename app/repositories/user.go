@@ -6,6 +6,7 @@ import (
 	"goshaka/app/models"
 	"goshaka/app/structs"
 	"goshaka/database"
+	"goshaka/helpers"
 	"time"
 
 	appConfig "goshaka/configs"
@@ -84,19 +85,49 @@ func Register(c *fiber.Ctx) (models.User, error) {
 		return user, fmt.Errorf("payload error")
 	}
 	email := sanitise.Sanitize(userCreateStructure.Email)
+	username := sanitise.Sanitize(userCreateStructure.Username)
 	password := sanitise.Sanitize(userCreateStructure.Password)
 	first_name := sanitise.Sanitize(userCreateStructure.FirstName)
 	last_name := sanitise.Sanitize(userCreateStructure.LastName)
 
 	db := database.DB
 
+	//Check the existence first
+	var existingUser models.User
+	checkUser := db.Where("email = ?", email).Or("username = ?", username).Find(&existingUser)
+	if checkUser.RowsAffected > 0 {
+		return user, fmt.Errorf("registration is failed")
+	}
+
 	//Set User
-	db.Create(&models.User{
+	newUser := models.User{
 		FirstName: first_name,
 		LastName:  last_name,
 		Password:  password,
 		Email:     email,
+		Username:  username,
+	}
+	db.Create(&newUser)
+
+	token := helpers.RandomNumber(6)
+	hashedToken, _ := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
+
+	emailData := struct {
+		FirstName string
+		Token     string
+	}{
+		FirstName: first_name,
+		Token:     string(token),
+	}
+
+	db.Create(&models.UserToken{
+		UserId:    newUser.ID,
+		Type:      "registration",
+		Token:     string(hashedToken),
+		ExpiredAt: time.Now().Add(time.Hour * 72), // 3days
 	})
+
+	helpers.SendMail(email, "Complete your registration", "registration", emailData)
 
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
 	//Set Role

@@ -16,7 +16,7 @@ type User struct {
 	LastName    string `gorm:"size:150" json:"last_name"`
 	Password    string `gorm:"size:150;not null" json:"password"`
 	RoleUser    []RoleUser
-	ValidatedAt time.Time `json:"validated_at"`
+	ValidatedAt time.Time `gorm:"null;default:null" json:"validated_at"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

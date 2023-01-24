@@ -56,7 +56,6 @@ func Register(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{
 			"error": true,
-			"user":  user,
 			"data":  err,
 		})
 	}
