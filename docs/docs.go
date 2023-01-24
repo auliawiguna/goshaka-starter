@@ -110,7 +110,7 @@ const docTemplate = `{
         },
         "/api/v1/auth/register": {
             "post": {
-                "description": "Register",
+                "description": "Register new account",
                 "consumes": [
                     "application/json"
                 ],
@@ -120,7 +120,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register",
+                "summary": "Register new account",
                 "parameters": [
                     {
                         "description": "email",
@@ -129,6 +129,41 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/structs.UserCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/validate-registration": {
+            "post": {
+                "description": "Validate registration",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Validate registration",
+                "parameters": [
+                    {
+                        "description": "token",
+                        "name": "loginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/structs.RegistrationToken"
                         }
                     }
                 ],
@@ -836,6 +871,25 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.RegistrationToken": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "token"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "token": {
                     "type": "string"
                 }
             }

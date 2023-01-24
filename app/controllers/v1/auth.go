@@ -66,6 +66,31 @@ func Register(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Validate registration
+// @Description Validate registration
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	loginRequest	body	structs.RegistrationToken	true	"token"
+// @Router /api/v1/auth/validate-registration [post]
+func ValidateRegistration(c *fiber.Ctx) error {
+	user, jwt, err := repositories_v1.ValidateRegistration(c)
+
+	if err != nil {
+		return c.Status(401).JSON(fiber.Map{
+			"error": true,
+			"data":  err,
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"error":        false,
+		"user":         user,
+		"access_token": jwt,
+	})
+}
+
 // @Security BearerAuth
 // @Summary My Profile
 // @Description My Profile

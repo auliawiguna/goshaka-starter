@@ -45,16 +45,68 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	db := database.DB
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
 
-	errHash := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	errHash := helpers.CompareHash(user.Password, password)
 
-	if errHash != nil {
-		fmt.Print(user.Password)
+	if !errHash {
 		return user, "", fmt.Errorf("credential cannot be found")
 	}
 
-	token := jwt.New(jwt.SigningMethodHS256)
+	return GenerateJwt(user)
+}
 
-	claims := token.Claims.(jwt.MapClaims)
+func ValidateRegistration(c *fiber.Ctx) (models.User, string, error) {
+	sanitise := bluemonday.UGCPolicy()
+
+	var user models.User
+	var loginStructure structs.RegistrationToken
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &loginStructure)
+
+	if err != nil {
+		return user, "", fmt.Errorf("payload error")
+	}
+	email := sanitise.Sanitize(loginStructure.Email)
+	password := sanitise.Sanitize(loginStructure.Password)
+	tokenPayload := sanitise.Sanitize(loginStructure.Token)
+
+	db := database.DB
+	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
+
+	errHash := helpers.CompareHash(user.Password, password)
+
+	if !errHash {
+		return user, "", fmt.Errorf("credential cannot be found")
+	}
+
+	//Find the token
+	var token models.UserToken
+	checkToken := db.Where("user_id = ?", user.ID).Where("type = ?", "registration").Where("expired_at > ?", time.Now()).First(&token)
+	if checkToken.RowsAffected == 0 {
+		return user, "", fmt.Errorf("token is not found")
+	}
+
+	//Verify token
+	errToken := helpers.CompareHash(token.Token, tokenPayload)
+	if !errToken {
+		return user, "", fmt.Errorf("credential cannot be found")
+	}
+
+	//Delete token
+	db.Unscoped().Delete(&token)
+
+	//Validate user
+	db.Model(&user).Update("validated_at", time.Now())
+
+	//Generate token
+	return GenerateJwt(user)
+}
+
+func GenerateJwt(user models.User) (models.User, string, error) {
+	tokenData := jwt.New(jwt.SigningMethodHS256)
+
+	claims := tokenData.Claims.(jwt.MapClaims)
 	claims["username"] = user.Username
 	claims["id"] = user.ID
 	claims["email"] = user.Email
@@ -62,7 +114,7 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 
 	secret := []byte(appConfig.GetEnv("JWT_KEY"))
 
-	tokenString, err := token.SignedString(secret)
+	tokenString, err := tokenData.SignedString(secret)
 
 	if err != nil {
 		return user, "", fmt.Errorf("error when generate JWT")
