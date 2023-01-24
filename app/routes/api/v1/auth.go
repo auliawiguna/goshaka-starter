@@ -13,6 +13,6 @@ func AuthRoute(router fiber.Router) {
 	auth := router.Group("/auth")
 
 	auth.Post("/login", validator.LoginValidator, controllerV1.Login)
-	auth.Post("/register", validator.CreateUserValidator, controllerV1.Login)
+	auth.Post("/register", validator.CreateUserValidator, controllerV1.Register)
 	auth.Get("/my-profile", middlewares.ValidateJWT, controllerV1.MyProfile)
 }
