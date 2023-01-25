@@ -1,4 +1,6 @@
-# GOSHAKA - A production ready Golang Boilerplate API
+![image](https://user-images.githubusercontent.com/26473549/214473471-19e5a263-cf21-440a-9beb-d2cc16eed9fc.png)
+
+# A production ready Golang Boilerplate API
 
 Inspired by [Fiber backend template for Create Go App CLI](https://github.com/create-go-app/fiber-go-template) ^^
 
