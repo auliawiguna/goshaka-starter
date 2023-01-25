@@ -16,10 +16,9 @@ Inspired by [Fiber backend template for Create Go App CLI](https://github.com/cr
 - Reset Password
 - My Profile
 - Change Profile
-- Role Based Access Control
 - Example of CRUD function
 - Verification on email change
-- RBAC Permission Matrix inspired by [Spatie Laravel Permission Matrix](https://github.com/spatie/laravel-permission)
+- Role Permission Based Access Control inspired by [Spatie Laravel Permission Matrix](https://github.com/spatie/laravel-permission)
 
 ## Capabilities
 - Auto migration
