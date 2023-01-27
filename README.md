@@ -1,4 +1,6 @@
-# GOSHAKA - A production ready Golang Boilerplate API
+![image](https://user-images.githubusercontent.com/26473549/214473471-19e5a263-cf21-440a-9beb-d2cc16eed9fc.png)
+
+# A production ready Golang Boilerplate API
 
 Inspired by [Fiber backend template for Create Go App CLI](https://github.com/create-go-app/fiber-go-template) ^^
 
@@ -14,10 +16,9 @@ Inspired by [Fiber backend template for Create Go App CLI](https://github.com/cr
 - Reset Password
 - My Profile
 - Change Profile
-- Role Based Access Control
 - Example of CRUD function
 - Verification on email change
-- RBAC Permission Matrix inspired by [Spatie Laravel Permission Matrix](https://github.com/spatie/laravel-permission)
+- Role Permission Based Access Control inspired by [Spatie Laravel Permission Matrix](https://github.com/spatie/laravel-permission)
 
 ## Capabilities
 - Auto migration
