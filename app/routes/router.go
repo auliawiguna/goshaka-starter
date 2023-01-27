@@ -26,5 +26,6 @@ func ApiRoutes(app *fiber.App) {
 	routeV1.AuthRoute(apiV1)
 	routeV1.RoleRoute(apiV1)
 	routeV1.PermissionRoute(apiV1)
+	routeV1.UserRoute(apiV1)
 	routeV1.SwaggerRoute(apiV1)
 }

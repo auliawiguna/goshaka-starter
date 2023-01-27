@@ -68,6 +68,8 @@ definitions:
         type: string
       password_confirmation:
         type: string
+      role_id:
+        type: integer
       username:
         type: string
     required:
@@ -612,6 +614,144 @@ paths:
       summary: Update existing role
       tags:
       - Roles
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Show users
+      parameters:
+      - default: 10
+        description: Default 10
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Default 10
+        in: query
+        name: page
+        type: integer
+      - description: Sorting
+        enum:
+        - ID asc
+        - ID desc
+        - title asc
+        - title desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create new user
+      parameters:
+      - description: title
+        in: body
+        name: usersRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.UserCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create new user
+      tags:
+      - Users
+  /api/v1/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing user
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete existing user
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Show detail user
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show detail user
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update existing user
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      - description: title
+        in: body
+        name: usersRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.UserCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update existing user
+      tags:
+      - Users
 securityDefinitions:
   BearerAuth:
     in: header

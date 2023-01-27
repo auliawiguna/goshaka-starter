@@ -24,16 +24,16 @@ func ValidateJWT(c *fiber.Ctx) error {
 		return secret, nil
 	})
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		c.Locals("user_id", claims["id"])
-		c.Locals("email", claims["email"])
-	}
-
 	if err != nil {
 		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 			"error": true,
 			"data":  "Unauthorised",
 		})
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		c.Locals("user_id", claims["id"])
+		c.Locals("email", claims["email"])
 	}
 
 	if !token.Valid {
