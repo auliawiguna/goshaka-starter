@@ -56,6 +56,51 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	return GenerateJwt(user)
 }
 
+func RequestResetPassword(c *fiber.Ctx) (string, error) {
+	sanitise := bluemonday.UGCPolicy()
+
+	var user models.User
+	var isExists bool
+	var userCreateStructure structs.UserCreate
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &userCreateStructure)
+
+	if err != nil {
+		return "", fmt.Errorf("payload error")
+	}
+	email := sanitise.Sanitize(userCreateStructure.Email)
+
+	db := database.DB
+
+	//Check the existence first
+	user, isExists = _CheckUserByEmail(email)
+	if isExists {
+		token := helpers.RandomNumber(6)
+		hashedToken, _ := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
+
+		emailData := struct {
+			FirstName string
+			Token     string
+		}{
+			FirstName: user.FirstName,
+			Token:     string(token),
+		}
+
+		db.Create(&models.UserToken{
+			UserId:    user.ID,
+			Type:      "reset_password",
+			Token:     string(hashedToken),
+			ExpiredAt: time.Now().Add(time.Hour * 72), // 3days
+		})
+
+		helpers.SendMail(email, "Request Reset Password", "request_reset_password", emailData)
+	}
+
+	return "success", nil
+}
+
 func ValidateRegistration(c *fiber.Ctx) (models.User, string, error) {
 	sanitise := bluemonday.UGCPolicy()
 
@@ -130,6 +175,17 @@ func _CheckUserByEmailOrUsername(email string, username string) (models.User, bo
 
 	var existingUser models.User
 	checkUser := db.Where("email = ?", email).Or("username = ?", username).Find(&existingUser)
+	if checkUser.RowsAffected > 0 {
+		return existingUser, true
+	}
+	return existingUser, false
+}
+
+func _CheckUserByEmail(email string) (models.User, bool) {
+	db := database.DB
+
+	var existingUser models.User
+	checkUser := db.Where("email = ?", email).Find(&existingUser)
 	if checkUser.RowsAffected > 0 {
 		return existingUser, true
 	}

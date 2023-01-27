@@ -91,6 +91,30 @@ func ValidateRegistration(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Validate registration
+// @Description Validate registration
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	loginRequest	body	structs.RequestResetPassword	true	"email"
+// @Router /api/v1/auth/request-reset-password [post]
+func RequestResetPassword(c *fiber.Ctx) error {
+	msg, err := repositories_v1.RequestResetPassword(c)
+
+	if err != nil {
+		return c.Status(401).JSON(fiber.Map{
+			"error": true,
+			"data":  err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"error":   false,
+		"message": msg,
+	})
+}
+
 // @Security BearerAuth
 // @Summary My Profile
 // @Description My Profile
