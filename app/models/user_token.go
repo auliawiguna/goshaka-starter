@@ -2,12 +2,10 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type UserToken struct {
-	gorm.Model
+	// gorm.Model
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	UserId    uint      `gorm:"not null" json:"user_id"`
 	Type      string    `gorm:"size:50;not null;unique" json:"type"`

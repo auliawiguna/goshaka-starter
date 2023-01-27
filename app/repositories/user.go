@@ -228,7 +228,7 @@ func UserShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
 	var users []*models.User
 	var error bool = false
 
-	db.Scopes(scopes.Paginate(users, &pagination, db)).Find(&users)
+	db.Scopes(scopes.Paginate(users, &pagination, db)).Preload("RoleUser.Role").Find(&users)
 	pagination.Rows = users
 
 	return &pagination, error
@@ -331,7 +331,8 @@ func UserDestroy(c *fiber.Ctx, id string) (models.User, error) {
 		return user, fmt.Errorf("not found")
 	}
 
-	if user.ID == c.Locals("user_id") {
+	currentUserId := fmt.Sprintf("%v", c.Locals("user_id"))
+	if fmt.Sprint(user.ID) == currentUserId {
 		return user, fmt.Errorf("you are not allowed to delete your own account")
 	}
 

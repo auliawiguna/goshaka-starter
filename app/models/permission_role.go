@@ -2,12 +2,10 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type PermissionRole struct {
-	gorm.Model
+	// gorm.Model
 	ID           uint       `gorm:"primaryKey" json:"id"`
 	PermissionId uint       `gorm:"not null" json:"permission_id"`
 	RoleId       uint       `gorm:"not null" json:"role_id"`
