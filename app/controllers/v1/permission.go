@@ -70,7 +70,7 @@ func PermissionStore(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 	return c.JSON(fiber.Map{
@@ -95,7 +95,7 @@ func PermissionUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 	return c.JSON(fiber.Map{
@@ -119,7 +119,7 @@ func PermissionDestroy(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 	return c.JSON(fiber.Map{

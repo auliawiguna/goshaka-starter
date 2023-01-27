@@ -23,7 +23,7 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{
 			"error": true,
 			"user":  user,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 	c.Cookie(&fiber.Cookie{
@@ -56,7 +56,7 @@ func Register(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{
 			"error": true,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 
@@ -80,7 +80,7 @@ func ValidateRegistration(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{
 			"error": true,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 

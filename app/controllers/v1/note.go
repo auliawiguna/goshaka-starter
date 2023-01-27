@@ -67,7 +67,7 @@ func NoteStore(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 	return c.JSON(fiber.Map{
@@ -91,7 +91,7 @@ func NoteUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 	return c.JSON(fiber.Map{
@@ -114,7 +114,7 @@ func NoteDestroy(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err,
+			"data":  err.Error(),
 		})
 	}
 	return c.JSON(fiber.Map{
