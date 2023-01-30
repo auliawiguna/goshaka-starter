@@ -109,6 +109,76 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 	return "success", nil
 }
 
+func ResetPassword(c *fiber.Ctx) (string, error) {
+	sanitise := bluemonday.UGCPolicy()
+
+	var user models.User
+	var isExists bool
+	var resetPasswordStructure structs.ResetPassword
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &resetPasswordStructure)
+
+	if err != nil {
+		return "", fmt.Errorf("payload error")
+	}
+	email := sanitise.Sanitize(resetPasswordStructure.Email)
+	token := sanitise.Sanitize(resetPasswordStructure.Token)
+	number := sanitise.Sanitize(resetPasswordStructure.Number)
+
+	db := database.DB
+
+	//Check the existence first
+	user, isExists = _CheckUserByEmail(email)
+	if isExists {
+		var existingToken models.UserToken
+		checkToken := db.Where("user_id = ?", user.ID).Where("token = ?", token).Where("type = ?", "reset_password").Find(&existingToken)
+		if checkToken.RowsAffected > 0 {
+			return "failed", fmt.Errorf("token not found")
+		}
+
+		//Check the token
+		hashedString, _ := helpers.DecryptText(existingToken.Token)
+		errHash := helpers.CompareHash(hashedString, number)
+
+		if !errHash {
+			return "failed", fmt.Errorf("Error hash")
+		}
+
+		token := helpers.RandomNumber(6)
+		hashedToken, err := helpers.EncryptText(token)
+		if err != nil {
+			return "failed", err
+		}
+
+		emailData := struct {
+			FirstName   string
+			Token       string
+			HashedToken string
+			FrontendUrl string
+			AppUrl      string
+		}{
+			FirstName:   user.FirstName,
+			Token:       string(token),
+			HashedToken: hashedToken,
+			FrontendUrl: appConfig.GetEnv("FRONTEND_URL"),
+			AppUrl:      appConfig.GetEnv("APP_URL"),
+		}
+
+		db.Create(&models.UserToken{
+			UserId:    user.ID,
+			Type:      "reset_password",
+			Token:     hashedToken,
+			ExpiredAt: time.Now().Add(time.Minute * 3), // 3minutes
+		})
+
+		helpers.SendMail(email, "Request Reset Password", "request_reset_password", emailData)
+	}
+
+	return "success", nil
+}
+
 func ValidateRegistration(c *fiber.Ctx) (models.User, string, error) {
 	sanitise := bluemonday.UGCPolicy()
 

@@ -115,6 +115,30 @@ func RequestResetPassword(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Request reset password
+// @Description Request reset password
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	loginRequest	body	structs.ResetPassword	true	"email"
+// @Router /api/v1/auth/reset-password [post]
+func ResetPassword(c *fiber.Ctx) error {
+	msg, err := repositories_v1.ResetPassword(c)
+
+	if err != nil {
+		return c.Status(401).JSON(fiber.Map{
+			"error": true,
+			"data":  err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"error":   false,
+		"message": msg,
+	})
+}
+
 // @Security BearerAuth
 // @Summary My Profile
 // @Description My Profile
