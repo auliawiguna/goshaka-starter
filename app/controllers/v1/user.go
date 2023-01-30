@@ -26,10 +26,10 @@ func UserIndex(c *fiber.Ctx) error {
 	pagination.Sort = c.Query("sort")
 	users, err := repositories_v1.UserShowAll(pagination)
 
-	return c.JSON(fiber.Map{
-		"error": err,
-		"data":  users,
-	})
+	if !err {
+		return helpers.UnprocessableResponse(c, users, "error")
+	}
+	return helpers.SuccessResponse(c, users, "success")
 }
 
 // @Security BearerAuth
@@ -45,15 +45,9 @@ func UserShow(c *fiber.Ctx) error {
 	user := repositories_v1.UserShow(c.Params("id"))
 
 	if user.ID == 0 {
-		return c.Status(404).JSON(fiber.Map{
-			"error": true,
-			"data":  nil,
-		})
+		return helpers.NotFoundResponse(c, user, "not found")
 	}
-	return c.Status(404).JSON(fiber.Map{
-		"error": false,
-		"data":  user,
-	})
+	return helpers.SuccessResponse(c, user, "success")
 }
 
 // @Security BearerAuth
@@ -68,15 +62,9 @@ func UserShow(c *fiber.Ctx) error {
 func UserStore(c *fiber.Ctx) error {
 	user, err := repositories_v1.UserCreate(c)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, user, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  user,
-	})
+	return helpers.SuccessResponse(c, user, "success")
 }
 
 // @Security BearerAuth
@@ -93,15 +81,9 @@ func UserUpdate(c *fiber.Ctx) error {
 	id := c.Params("id")
 	user, err := repositories_v1.UserUpdate(c, id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, user, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  user,
-	})
+	return helpers.SuccessResponse(c, user, "success")
 }
 
 // @Security BearerAuth
@@ -117,13 +99,7 @@ func UserDestroy(c *fiber.Ctx) error {
 	id := c.Params("id")
 	user, err := repositories_v1.UserDestroy(c, id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, user, "not found")
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  user,
-	})
+	return helpers.SuccessResponse(c, user, "success")
 }

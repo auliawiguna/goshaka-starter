@@ -21,11 +21,7 @@ func Login(c *fiber.Ctx) error {
 	user, jwt, err := repositories_v1.Login(c)
 
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{
-			"error": true,
-			"user":  user,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, user, err.Error())
 	}
 	c.Cookie(&fiber.Cookie{
 		Name:  "token",
@@ -36,11 +32,12 @@ func Login(c *fiber.Ctx) error {
 		Value: strconv.FormatUint(uint64(user.ID), 10),
 	})
 
-	return c.Status(200).JSON(fiber.Map{
-		"error":        false,
+	res := map[string]interface{}{
 		"user":         user,
 		"access_token": jwt,
-	})
+	}
+
+	return helpers.SuccessResponse(c, res, "success")
 }
 
 // @Summary Register new account
@@ -73,17 +70,15 @@ func ValidateRegistration(c *fiber.Ctx) error {
 	user, jwt, err := repositories_v1.ValidateRegistration(c)
 
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnauthorisedResponse(c, err, err.Error())
 	}
 
-	return c.Status(200).JSON(fiber.Map{
-		"error":        false,
+	res := map[string]interface{}{
 		"user":         user,
 		"access_token": jwt,
-	})
+	}
+
+	return helpers.SuccessResponse(c, res, "success")
 }
 
 // @Summary Resend registration token
@@ -116,16 +111,10 @@ func RequestResetPassword(c *fiber.Ctx) error {
 	msg, err := repositories_v1.RequestResetPassword(c)
 
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, err, err.Error())
 	}
 
-	return c.Status(200).JSON(fiber.Map{
-		"error":   false,
-		"message": msg,
-	})
+	return helpers.SuccessResponse(c, err, msg)
 }
 
 // @Summary Request reset password
@@ -140,16 +129,10 @@ func ResetPassword(c *fiber.Ctx) error {
 	msg, err := repositories_v1.ResetPassword(c)
 
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, err, err.Error())
 	}
 
-	return c.Status(200).JSON(fiber.Map{
-		"error":   false,
-		"message": msg,
-	})
+	return helpers.SuccessResponse(c, err, msg)
 }
 
 // @Security BearerAuth
@@ -165,14 +148,9 @@ func MyProfile(c *fiber.Ctx) error {
 	user := repositories_v1.UserShow(fmt.Sprintf("%f", userId))
 
 	if user.ID == 0 {
-		return c.Status(404).JSON(fiber.Map{
-			"error": true,
-			"data":  nil,
-		})
+		return helpers.NotFoundResponse(c, user, "not found")
 	}
-	return c.Status(404).JSON(fiber.Map{
-		"error": false,
-		"data":  user,
-	})
+
+	return helpers.SuccessResponse(c, user, "success")
 
 }

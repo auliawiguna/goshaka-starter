@@ -28,8 +28,35 @@ func SuccessResponse(c *fiber.Ctx, data interface{}, message string) error {
 //	return message string
 func UnprocessableResponse(c *fiber.Ctx, data interface{}, message string) error {
 	return c.Status(http.StatusUnprocessableEntity).JSON(fiber.Map{
-		"error":   false,
+		"error":   true,
 		"data":    data,
+		"message": message,
+	})
+}
+
+// Handle http unauthorised response
+//
+//	param c *fiber.Ctx
+//	param data interface{}
+//	param message string
+//	return message string
+func UnauthorisedResponse(c *fiber.Ctx, data interface{}, message string) error {
+	return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+		"error":   true,
+		"data":    data,
+		"message": message,
+	})
+}
+
+// Handle http 404 response
+//
+//	param c *fiber.Ctx
+//	param data interface{}
+//	param message string
+//	return message string
+func NotFoundResponse(c *fiber.Ctx, data interface{}, message string) error {
+	return c.Status(http.StatusNotFound).JSON(fiber.Map{
+		"error":   true,
 		"message": message,
 	})
 }
