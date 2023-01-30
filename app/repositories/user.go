@@ -16,7 +16,6 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/microcosm-cc/bluemonday"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func UserShow(id string) models.User {
@@ -78,7 +77,10 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 	user, isExists = _CheckUserByEmail(email)
 	if isExists {
 		token := helpers.RandomNumber(6)
-		hashedToken, _ := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
+		hashedToken, err := helpers.EncryptText(token)
+		if err != nil {
+			return "failed", err
+		}
 
 		emailData := struct {
 			FirstName   string
@@ -89,7 +91,7 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 		}{
 			FirstName:   user.FirstName,
 			Token:       string(token),
-			HashedToken: string(hashedToken),
+			HashedToken: hashedToken,
 			FrontendUrl: appConfig.GetEnv("FRONTEND_URL"),
 			AppUrl:      appConfig.GetEnv("APP_URL"),
 		}
@@ -97,7 +99,7 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 		db.Create(&models.UserToken{
 			UserId:    user.ID,
 			Type:      "reset_password",
-			Token:     string(hashedToken),
+			Token:     hashedToken,
 			ExpiredAt: time.Now().Add(time.Minute * 3), // 3minutes
 		})
 
@@ -258,7 +260,7 @@ func Register(c *fiber.Ctx) (models.User, error) {
 	db.Create(&newUser)
 
 	token := helpers.RandomNumber(6)
-	hashedToken, _ := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
+	hashedToken, _ := helpers.CreateHash(token)
 
 	emailData := struct {
 		FirstName string
@@ -271,7 +273,7 @@ func Register(c *fiber.Ctx) (models.User, error) {
 	db.Create(&models.UserToken{
 		UserId:    newUser.ID,
 		Type:      "registration",
-		Token:     string(hashedToken),
+		Token:     hashedToken,
 		ExpiredAt: time.Now().Add(time.Hour * 72), // 3days
 	})
 
