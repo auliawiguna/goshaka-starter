@@ -178,6 +178,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/auth/resend-registration-token": {
+            "post": {
+                "description": "Resend registration token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Resend registration token",
+                "parameters": [
+                    {
+                        "description": "email",
+                        "name": "loginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/structs.ResendToken"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/auth/reset-password": {
             "post": {
                 "description": "Request reset password",
@@ -1179,6 +1214,17 @@ const docTemplate = `{
             }
         },
         "structs.RequestResetPassword": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.ResendToken": {
             "type": "object",
             "required": [
                 "email"

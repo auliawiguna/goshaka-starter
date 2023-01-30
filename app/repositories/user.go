@@ -15,7 +15,6 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
-	"github.com/microcosm-cc/bluemonday"
 )
 
 func UserShow(id string) models.User {
@@ -28,7 +27,6 @@ func UserShow(id string) models.User {
 }
 
 func Login(c *fiber.Ctx) (models.User, string, error) {
-	sanitise := bluemonday.UGCPolicy()
 
 	var user models.User
 	var loginStructure structs.Login
@@ -40,8 +38,8 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	if err != nil {
 		return user, "", fmt.Errorf("payload error")
 	}
-	email := sanitise.Sanitize(loginStructure.Email)
-	password := sanitise.Sanitize(loginStructure.Password)
+	email := helpers.SanitiseText(loginStructure.Email)
+	password := helpers.SanitiseText(loginStructure.Password)
 
 	db := database.DB
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
@@ -58,8 +56,11 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	return GenerateJwt(user)
 }
 
+// To handle request reset password, back end will generate token, save plain token to database, and then send it to user using goroutine
+//
+//	param	c *fiber.Ctx
+//	return	string, error
 func RequestResetPassword(c *fiber.Ctx) (string, error) {
-	sanitise := bluemonday.UGCPolicy()
 
 	var user models.User
 	var isExists bool
@@ -72,12 +73,12 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("payload error")
 	}
-	email := sanitise.Sanitize(requestResetPasswordStructure.Email)
+	email := helpers.SanitiseText(requestResetPasswordStructure.Email)
 
 	db := database.DB
 
 	//Check the existence first
-	user, isExists = _CheckUserByEmail(email)
+	user, isExists = FindByEmail(email)
 	if isExists {
 		token := helpers.RandomNumber(6)
 		hashedToken, err := helpers.EncryptText(token)
@@ -102,7 +103,7 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 		db.Create(&models.UserToken{
 			UserId:    user.ID,
 			Type:      "reset_password",
-			Token:     hashedToken,
+			Token:     token,
 			ExpiredAt: time.Now().Add(time.Minute * 3), // 3minutes
 		})
 
@@ -112,8 +113,14 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 	return "success", nil
 }
 
+// To handle reset password,
+// user will sends encrypted token, password, and password confirmation,
+// once password has been updated, system will remove any reset password
+// tokens related to current user
+//
+//	param	c *fiber.Ctx
+//	return	string, error
 func ResetPassword(c *fiber.Ctx) (string, error) {
-	sanitise := bluemonday.UGCPolicy()
 
 	var user models.User
 
@@ -126,8 +133,11 @@ func ResetPassword(c *fiber.Ctx) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("payload error")
 	}
-	token := sanitise.Sanitize(resetPasswordStructure.Token)
-	password := sanitise.Sanitize(resetPasswordStructure.Password)
+	token, err := helpers.DecryptText(helpers.SanitiseText(resetPasswordStructure.Token))
+	if err != nil {
+		return "", fmt.Errorf("invalid request token")
+	}
+	password := helpers.SanitiseText(resetPasswordStructure.Password)
 
 	db := database.DB
 
@@ -138,7 +148,7 @@ func ResetPassword(c *fiber.Ctx) (string, error) {
 	}
 
 	//Check the existence first
-	user = FindUserById(existingToken.UserId)
+	user = FindById(existingToken.UserId)
 	if user.ID != 0 {
 		//Update user
 		db.Model(&user).Where("id = ?", user.ID).UpdateColumns(&models.User{
@@ -151,8 +161,14 @@ func ResetPassword(c *fiber.Ctx) (string, error) {
 	return "success", nil
 }
 
+// To validate user's registration
+// user will sends token, password, and email,
+// once password has been updated, system will remove any registration
+// tokens related to current user
+//
+//	param	c *fiber.Ctx
+//	return	string, error
 func ValidateRegistration(c *fiber.Ctx) (models.User, string, error) {
-	sanitise := bluemonday.UGCPolicy()
 
 	var user models.User
 	var loginStructure structs.RegistrationToken
@@ -164,9 +180,9 @@ func ValidateRegistration(c *fiber.Ctx) (models.User, string, error) {
 	if err != nil {
 		return user, "", fmt.Errorf("payload error")
 	}
-	email := sanitise.Sanitize(loginStructure.Email)
-	password := sanitise.Sanitize(loginStructure.Password)
-	tokenPayload := sanitise.Sanitize(loginStructure.Token)
+	email := helpers.SanitiseText(loginStructure.Email)
+	password := helpers.SanitiseText(loginStructure.Password)
+	tokenPayload := helpers.SanitiseText(loginStructure.Token)
 
 	db := database.DB
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
@@ -200,6 +216,65 @@ func ValidateRegistration(c *fiber.Ctx) (models.User, string, error) {
 	return GenerateJwt(user)
 }
 
+// To resend a new user's registration token
+// user will sends email,
+//
+//	param	c *fiber.Ctx
+//	return	string, error
+func ResendNewRegistrationToken(c *fiber.Ctx) error {
+
+	var user models.User
+	var loginStructure structs.RegistrationToken
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &loginStructure)
+
+	if err != nil {
+		return fmt.Errorf("payload error")
+	}
+	email := helpers.SanitiseText(loginStructure.Email)
+
+	db := database.DB
+	// find user
+	db.Where("email = ?", email).Where("validated_at is null").Find(&user)
+
+	if user.ID == 0 {
+		return fmt.Errorf("user not found")
+	}
+
+	//Delete the token first
+	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "registration").Delete(&models.UserToken{})
+
+	token := helpers.RandomNumber(6)
+	hashedToken, _ := helpers.CreateHash(token)
+
+	emailData := struct {
+		FirstName string
+		Token     string
+		AppUrl    string
+	}{
+		FirstName: user.FirstName,
+		Token:     string(token),
+		AppUrl:    appConfig.GetEnv("APP_URL"),
+	}
+
+	db.Create(&models.UserToken{
+		UserId:    user.ID,
+		Type:      "registration",
+		Token:     hashedToken,
+		ExpiredAt: time.Now().Add(time.Hour * 72), // 3days
+	})
+
+	helpers.SendMail(email, "Complete your registration", "registration", emailData)
+
+	return nil
+}
+
+// Generate stateless JWT auth
+//
+//	param user models.User
+//	return models.User, string, error
 func GenerateJwt(user models.User) (models.User, string, error) {
 	tokenData := jwt.New(jwt.SigningMethodHS256)
 
@@ -220,7 +295,12 @@ func GenerateJwt(user models.User) (models.User, string, error) {
 	return user, tokenString, nil
 }
 
-func _CheckUserByEmailOrUsername(email string, username string) (models.User, bool) {
+// Find a user by email address or username
+//
+//	param	email string
+//	param	username string
+//	return	models.User, bool
+func FindByEmailOrUsername(email string, username string) (models.User, bool) {
 	db := database.DB
 
 	var existingUser models.User
@@ -231,7 +311,12 @@ func _CheckUserByEmailOrUsername(email string, username string) (models.User, bo
 	return existingUser, false
 }
 
-func _CheckUserByEmail(email string) (models.User, bool) {
+// Find a user by email address
+//
+//	param	email string
+//	param	username string
+//	return	models.User, bool
+func FindByEmail(email string) (models.User, bool) {
 	db := database.DB
 
 	var existingUser models.User
@@ -242,7 +327,12 @@ func _CheckUserByEmail(email string) (models.User, bool) {
 	return existingUser, false
 }
 
-func FindUserById(id uint) models.User {
+// Find a user by ID
+//
+//	param	email string
+//	param	username string
+//	return	models.User, bool
+func FindById(id uint) models.User {
 	db := database.DB
 	var user models.User
 
@@ -252,11 +342,22 @@ func FindUserById(id uint) models.User {
 
 }
 
+// To delete roles by user ID
+//
+//	params	userId	uint
+//
+// return void
 func _DeleteRolesByUser(userId uint) {
 	db := database.DB
 	db.Unscoped().Delete(&models.RoleUser{}, "user_id = ?", userId)
 }
 
+// To delete all roles by user ID and repopulate a role by roleId
+//
+//	params	userId	uint
+//	params	roleId	uint
+//
+// return void
 func _ResetRole(userId uint, roleId uint) {
 	db := database.DB
 	_DeleteRolesByUser(userId)
@@ -266,6 +367,12 @@ func _ResetRole(userId uint, roleId uint) {
 	})
 }
 
+// To set a role by user ID
+//
+//	params	userId	uint
+//	params	roleId	uint
+//
+// return void
 func _SetRole(userId uint, roleId uint) {
 	db := database.DB
 	db.Create(&models.RoleUser{
@@ -274,8 +381,13 @@ func _SetRole(userId uint, roleId uint) {
 	})
 }
 
+// Handle user's registration, user will sends email, username, password, first name, and last name
+// System will sends verification token for users to verify their account
+// Email will be handled by goroutine
+//
+//	params c *fiber.Ctx
+//	return models.User, error
 func Register(c *fiber.Ctx) (models.User, error) {
-	sanitise := bluemonday.UGCPolicy()
 
 	var user models.User
 	var userCreateStructure structs.UserCreate
@@ -287,16 +399,16 @@ func Register(c *fiber.Ctx) (models.User, error) {
 	if err != nil {
 		return user, fmt.Errorf("payload error")
 	}
-	email := sanitise.Sanitize(userCreateStructure.Email)
-	username := sanitise.Sanitize(userCreateStructure.Username)
-	password := sanitise.Sanitize(userCreateStructure.Password)
-	first_name := sanitise.Sanitize(userCreateStructure.FirstName)
-	last_name := sanitise.Sanitize(userCreateStructure.LastName)
+	email := helpers.SanitiseText(userCreateStructure.Email)
+	username := helpers.SanitiseText(userCreateStructure.Username)
+	password := helpers.SanitiseText(userCreateStructure.Password)
+	first_name := helpers.SanitiseText(userCreateStructure.FirstName)
+	last_name := helpers.SanitiseText(userCreateStructure.LastName)
 
 	db := database.DB
 
 	//Check the existence first
-	_, isExists := _CheckUserByEmailOrUsername(email, username)
+	_, isExists := FindByEmailOrUsername(email, username)
 	if isExists {
 		return user, fmt.Errorf("registration is failed")
 	}
@@ -317,9 +429,11 @@ func Register(c *fiber.Ctx) (models.User, error) {
 	emailData := struct {
 		FirstName string
 		Token     string
+		AppUrl    string
 	}{
 		FirstName: first_name,
 		Token:     string(token),
+		AppUrl:    appConfig.GetEnv("APP_URL"),
 	}
 
 	db.Create(&models.UserToken{
@@ -352,7 +466,6 @@ func UserShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
 
 func UserCreate(c *fiber.Ctx) (models.User, error) {
 	db := database.DB
-	sanitise := bluemonday.UGCPolicy()
 
 	var user models.User
 	var isExists bool
@@ -365,14 +478,14 @@ func UserCreate(c *fiber.Ctx) (models.User, error) {
 	if err != nil {
 		return user, fmt.Errorf("payload error")
 	}
-	email := sanitise.Sanitize(userCreateStructure.Email)
-	username := sanitise.Sanitize(userCreateStructure.Username)
-	password := sanitise.Sanitize(userCreateStructure.Password)
-	first_name := sanitise.Sanitize(userCreateStructure.FirstName)
-	last_name := sanitise.Sanitize(userCreateStructure.LastName)
-	role_id, _ := strconv.Atoi(sanitise.Sanitize(fmt.Sprint(userCreateStructure.RoleId)))
+	email := helpers.SanitiseText(userCreateStructure.Email)
+	username := helpers.SanitiseText(userCreateStructure.Username)
+	password := helpers.SanitiseText(userCreateStructure.Password)
+	first_name := helpers.SanitiseText(userCreateStructure.FirstName)
+	last_name := helpers.SanitiseText(userCreateStructure.LastName)
+	role_id, _ := strconv.Atoi(helpers.SanitiseText(fmt.Sprint(userCreateStructure.RoleId)))
 
-	user, isExists = _CheckUserByEmailOrUsername(email, username)
+	user, isExists = FindByEmailOrUsername(email, username)
 	if isExists {
 		return user, fmt.Errorf("user already exists")
 	}
@@ -396,7 +509,6 @@ func UserCreate(c *fiber.Ctx) (models.User, error) {
 
 func UserUpdate(c *fiber.Ctx, id string) (models.User, error) {
 	db := database.DB
-	sanitise := bluemonday.UGCPolicy()
 
 	var user models.User
 	var isExists bool
@@ -409,14 +521,14 @@ func UserUpdate(c *fiber.Ctx, id string) (models.User, error) {
 	if err != nil {
 		return user, fmt.Errorf("payload error")
 	}
-	email := sanitise.Sanitize(userStructure.Email)
-	username := sanitise.Sanitize(userStructure.Username)
-	password := sanitise.Sanitize(userStructure.Password)
-	first_name := sanitise.Sanitize(userStructure.FirstName)
-	last_name := sanitise.Sanitize(userStructure.LastName)
-	role_id, _ := strconv.Atoi(sanitise.Sanitize(fmt.Sprint(userStructure.RoleId)))
+	email := helpers.SanitiseText(userStructure.Email)
+	username := helpers.SanitiseText(userStructure.Username)
+	password := helpers.SanitiseText(userStructure.Password)
+	first_name := helpers.SanitiseText(userStructure.FirstName)
+	last_name := helpers.SanitiseText(userStructure.LastName)
+	role_id, _ := strconv.Atoi(helpers.SanitiseText(fmt.Sprint(userStructure.RoleId)))
 
-	user, isExists = _CheckUserByEmailOrUsername(email, username)
+	user, isExists = FindByEmailOrUsername(email, username)
 	if !isExists {
 		return user, fmt.Errorf("user is not exists")
 	}

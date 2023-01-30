@@ -3,6 +3,7 @@ package controller_v1
 import (
 	"fmt"
 	repositories_v1 "goshaka/app/repositories"
+	"goshaka/helpers"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -54,16 +55,10 @@ func Register(c *fiber.Ctx) error {
 	user, err := repositories_v1.Register(c)
 
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, err, err.Error())
 	}
 
-	return c.Status(200).JSON(fiber.Map{
-		"error": false,
-		"user":  user,
-	})
+	return helpers.SuccessResponse(c, user, "success")
 }
 
 // @Summary Validate registration
@@ -89,6 +84,24 @@ func ValidateRegistration(c *fiber.Ctx) error {
 		"user":         user,
 		"access_token": jwt,
 	})
+}
+
+// @Summary Resend registration token
+// @Description Resend registration token
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	loginRequest	body	structs.ResendToken	true	"email"
+// @Router /api/v1/auth/resend-registration-token [post]
+func ResendRegistrationToken(c *fiber.Ctx) error {
+	err := repositories_v1.ResendNewRegistrationToken(c)
+
+	if err != nil {
+		return helpers.UnprocessableResponse(c, err, err.Error())
+	}
+
+	return helpers.SuccessResponse(c, err, "success")
 }
 
 // @Summary Request reset password

@@ -9,13 +9,22 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Handle authorisation routes
+//
+//	param router fiber.ROuter
+//	return	void
 func AuthRoute(router fiber.Router) {
 	auth := router.Group("/auth")
 
+	// Login
 	auth.Post("/login", validator.LoginValidator, controllerV1.Login)
+	// Registration
 	auth.Post("/register", validator.CreateUserValidator, controllerV1.Register)
 	auth.Post("/validate-registration", validator.RegistrationValidator, controllerV1.ValidateRegistration)
+	auth.Post("/resend-registration-token", validator.ResendTokenValidator, controllerV1.ResendRegistrationToken)
+	// Forgot Password
 	auth.Post("/request-reset-password", validator.RequestResetPasswordValidator, controllerV1.RequestResetPassword)
 	auth.Post("/reset-password", validator.ResetPasswordValidator, controllerV1.ResetPassword)
+	// My Profile
 	auth.Get("/my-profile", middlewares.ValidateJWT, controllerV1.MyProfile)
 }

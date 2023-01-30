@@ -10,14 +10,24 @@ import (
 	"goshaka/configs"
 	"io"
 
+	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Compare hash and a plain text, will returns true if hash is match
+//
+//	param	hashed	string
+//	param	plain	string
+//	return	bool
 func CompareHash(hashed string, plain string) bool {
 	errHash := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(plain))
 	return errHash == nil
 }
 
+// Convert plain text to hash string
+//
+//	param	text	string
+//	return	string, error
 func CreateHash(text string) (string, error) {
 	hashedToken, err := bcrypt.GenerateFromPassword([]byte(text), bcrypt.DefaultCost)
 	if err != nil {
@@ -32,6 +42,10 @@ func PadKey(key []byte, blockSize int) []byte {
 	return append(key, pad...)
 }
 
+// Convert plain text to encrypted string
+//
+//	param	originText	string
+//	return	string, error
 func EncryptText(originText string) (string, error) {
 	key := PadKey([]byte(configs.GetEnv("APP_KEY")), aes.BlockSize)
 	plaintext := []byte(originText)
@@ -53,6 +67,10 @@ func EncryptText(originText string) (string, error) {
 	return base64.StdEncoding.EncodeToString(ciphertext), nil
 }
 
+// Convert decrypted text to plain text
+//
+//	param	encryptedText	string
+//	return	string, error
 func DecryptText(encryptedText string) (string, error) {
 	decodedString, _ := base64.StdEncoding.DecodeString(encryptedText)
 	ciphertext := decodedString
@@ -73,4 +91,13 @@ func DecryptText(encryptedText string) (string, error) {
 	stream.XORKeyStream(ciphertext, ciphertext)
 
 	return string(ciphertext), nil
+}
+
+// sanitise text
+//
+//	param	str	string
+//	return	string
+func SanitiseText(str string) string {
+	sanitise := bluemonday.UGCPolicy()
+	return sanitise.Sanitize(str)
 }

@@ -53,6 +53,13 @@ definitions:
     required:
     - email
     type: object
+  structs.ResendToken:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   structs.ResetPassword:
     properties:
       password:
@@ -210,6 +217,29 @@ paths:
             additionalProperties: true
             type: object
       summary: Request reset password
+      tags:
+      - Auth
+  /api/v1/auth/resend-registration-token:
+    post:
+      consumes:
+      - application/json
+      description: Resend registration token
+      parameters:
+      - description: email
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.ResendToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Resend registration token
       tags:
       - Auth
   /api/v1/auth/reset-password:
