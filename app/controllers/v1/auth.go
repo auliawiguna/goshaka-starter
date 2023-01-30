@@ -91,8 +91,8 @@ func ValidateRegistration(c *fiber.Ctx) error {
 	})
 }
 
-// @Summary Validate registration
-// @Description Validate registration
+// @Summary Request reset password
+// @Description Request reset password
 // @Tags Auth
 // @Accept application/json
 // @Produce json
