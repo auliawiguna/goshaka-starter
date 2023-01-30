@@ -5,7 +5,7 @@ type RequestResetPassword struct {
 }
 
 type ResetPassword struct {
-	Email  string `json:"email" validate:"required"`
-	Token  string `json:"token" validate:"required"`
-	Number string `json:"number" validate:"required"`
+	Password             string `json:"password" validate:"required"`
+	PasswordConfirmation string `json:"password_confirmation" validate:"required,eqfield=Password"`
+	Token                string `json:"token" validate:"required"`
 }

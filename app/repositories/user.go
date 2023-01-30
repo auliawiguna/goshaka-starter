@@ -123,57 +123,27 @@ func ResetPassword(c *fiber.Ctx) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("payload error")
 	}
-	email := sanitise.Sanitize(resetPasswordStructure.Email)
 	token := sanitise.Sanitize(resetPasswordStructure.Token)
-	number := sanitise.Sanitize(resetPasswordStructure.Number)
+	password := sanitise.Sanitize(resetPasswordStructure.Password)
 
 	db := database.DB
 
+	var existingToken models.UserToken
+	checkToken := db.Where("token = ?", token).Where("type = ?", "reset_password").Find(&existingToken)
+	if checkToken.RowsAffected > 0 {
+		return "failed", fmt.Errorf("token not found")
+	}
+
 	//Check the existence first
-	user, isExists = _CheckUserByEmail(email)
+	user, isExists = FindUserById(string(existingToken.ID))
 	if isExists {
-		var existingToken models.UserToken
-		checkToken := db.Where("user_id = ?", user.ID).Where("token = ?", token).Where("type = ?", "reset_password").Find(&existingToken)
-		if checkToken.RowsAffected > 0 {
-			return "failed", fmt.Errorf("token not found")
-		}
-
-		//Check the token
-		hashedString, _ := helpers.DecryptText(existingToken.Token)
-		errHash := helpers.CompareHash(hashedString, number)
-
-		if !errHash {
-			return "failed", fmt.Errorf("Error hash")
-		}
-
-		token := helpers.RandomNumber(6)
-		hashedToken, err := helpers.EncryptText(token)
-		if err != nil {
-			return "failed", err
-		}
-
-		emailData := struct {
-			FirstName   string
-			Token       string
-			HashedToken string
-			FrontendUrl string
-			AppUrl      string
-		}{
-			FirstName:   user.FirstName,
-			Token:       string(token),
-			HashedToken: hashedToken,
-			FrontendUrl: appConfig.GetEnv("FRONTEND_URL"),
-			AppUrl:      appConfig.GetEnv("APP_URL"),
-		}
-
-		db.Create(&models.UserToken{
-			UserId:    user.ID,
-			Type:      "reset_password",
-			Token:     hashedToken,
-			ExpiredAt: time.Now().Add(time.Minute * 3), // 3minutes
+		//Update user
+		db.Model(&user).Where("id = ?", user.ID).UpdateColumns(&models.User{
+			Password: password,
 		})
-
-		helpers.SendMail(email, "Request Reset Password", "request_reset_password", emailData)
+		//Remove all reset password token
+		db.Unscoped().Delete(&models.UserToken{}, "user_id = ?", user.ID)
+		// checkToken := db.Where("token = ?", token).Where("type = ?", "reset_password").Find(&existingToken)
 	}
 
 	return "success", nil
@@ -264,6 +234,17 @@ func _CheckUserByEmail(email string) (models.User, bool) {
 
 	var existingUser models.User
 	checkUser := db.Where("email = ?", email).Find(&existingUser)
+	if checkUser.RowsAffected > 0 {
+		return existingUser, true
+	}
+	return existingUser, false
+}
+
+func FindUserById(id string) (models.User, bool) {
+	db := database.DB
+
+	var existingUser models.User
+	checkUser := db.Where("id = ?", id).Find(&existingUser)
 	if checkUser.RowsAffected > 0 {
 		return existingUser, true
 	}
