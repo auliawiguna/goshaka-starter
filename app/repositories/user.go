@@ -61,16 +61,16 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 
 	var user models.User
 	var isExists bool
-	var userCreateStructure structs.UserCreate
+	var requestResetPasswordStructure structs.RequestResetPassword
 
 	body := c.Body()
 
-	err := json.Unmarshal(body, &userCreateStructure)
+	err := json.Unmarshal(body, &requestResetPasswordStructure)
 
 	if err != nil {
 		return "", fmt.Errorf("payload error")
 	}
-	email := sanitise.Sanitize(userCreateStructure.Email)
+	email := sanitise.Sanitize(requestResetPasswordStructure.Email)
 
 	db := database.DB
 
@@ -81,18 +81,24 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 		hashedToken, _ := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
 
 		emailData := struct {
-			FirstName string
-			Token     string
+			FirstName   string
+			Token       string
+			HashedToken string
+			FrontendUrl string
+			AppUrl      string
 		}{
-			FirstName: user.FirstName,
-			Token:     string(token),
+			FirstName:   user.FirstName,
+			Token:       string(token),
+			HashedToken: string(hashedToken),
+			FrontendUrl: appConfig.GetEnv("FRONTEND_URL"),
+			AppUrl:      appConfig.GetEnv("APP_URL"),
 		}
 
 		db.Create(&models.UserToken{
 			UserId:    user.ID,
 			Type:      "reset_password",
 			Token:     string(hashedToken),
-			ExpiredAt: time.Now().Add(time.Hour * 72), // 3days
+			ExpiredAt: time.Now().Add(time.Minute * 3), // 3minutes
 		})
 
 		helpers.SendMail(email, "Request Reset Password", "request_reset_password", emailData)

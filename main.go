@@ -34,6 +34,7 @@ func main() {
 	//Router
 	apiRoutes.MainRoutes(app)
 	apiRoutes.ApiRoutes(app)
+	apiRoutes.StaticFile(app)
 
 	if appConfig.GetEnv("ENV") == "dev" {
 		appHelper.StartServer(app)

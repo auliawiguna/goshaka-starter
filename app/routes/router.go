@@ -7,6 +7,17 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
+func StaticFile(app *fiber.App) {
+	//Serve local path
+	app.Static("/images", "./public/images", fiber.Static{
+		Compress:  true,
+		ByteRange: true,
+		Browse:    false,
+		Index:     "index.html",
+		MaxAge:    3600,
+	})
+}
+
 func MainRoutes(app *fiber.App) {
 	mainRoute := app.Group("/", logger.New())
 	mainRoute.Get("/", func(c *fiber.Ctx) error {

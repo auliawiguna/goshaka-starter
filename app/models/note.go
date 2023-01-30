@@ -2,12 +2,10 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Note struct {
-	gorm.Model
+	// gorm.Model
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	Title     string    `json:"title"`
 	SubTitle  string    `json:"subtitle"`
