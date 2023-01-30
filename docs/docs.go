@@ -145,7 +145,7 @@ const docTemplate = `{
         },
         "/api/v1/auth/request-reset-password": {
             "post": {
-                "description": "Validate registration",
+                "description": "Request reset password",
                 "consumes": [
                     "application/json"
                 ],
@@ -155,7 +155,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Validate registration",
+                "summary": "Request reset password",
                 "parameters": [
                     {
                         "description": "email",
@@ -164,6 +164,41 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/structs.RequestResetPassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/reset-password": {
+            "post": {
+                "description": "Request reset password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Request reset password",
+                "parameters": [
+                    {
+                        "description": "email",
+                        "name": "loginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/structs.ResetPassword"
                         }
                     }
                 ],
@@ -1150,6 +1185,25 @@ const docTemplate = `{
             ],
             "properties": {
                 "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.ResetPassword": {
+            "type": "object",
+            "required": [
+                "password",
+                "password_confirmation",
+                "token"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "password_confirmation": {
+                    "type": "string"
+                },
+                "token": {
                     "type": "string"
                 }
             }

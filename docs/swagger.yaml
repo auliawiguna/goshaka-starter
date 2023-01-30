@@ -53,6 +53,19 @@ definitions:
     required:
     - email
     type: object
+  structs.ResetPassword:
+    properties:
+      password:
+        type: string
+      password_confirmation:
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - password_confirmation
+    - token
+    type: object
   structs.RoleCreate:
     properties:
       display:
@@ -180,7 +193,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Validate registration
+      description: Request reset password
       parameters:
       - description: email
         in: body
@@ -196,7 +209,30 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Validate registration
+      summary: Request reset password
+      tags:
+      - Auth
+  /api/v1/auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Request reset password
+      parameters:
+      - description: email
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/structs.ResetPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Request reset password
       tags:
       - Auth
   /api/v1/auth/validate-registration:

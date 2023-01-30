@@ -46,6 +46,9 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	db := database.DB
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
 
+	//Remove all reset password token
+	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
+
 	errHash := helpers.CompareHash(user.Password, password)
 
 	if !errHash {
@@ -113,7 +116,7 @@ func ResetPassword(c *fiber.Ctx) (string, error) {
 	sanitise := bluemonday.UGCPolicy()
 
 	var user models.User
-	var isExists bool
+
 	var resetPasswordStructure structs.ResetPassword
 
 	body := c.Body()
@@ -129,21 +132,20 @@ func ResetPassword(c *fiber.Ctx) (string, error) {
 	db := database.DB
 
 	var existingToken models.UserToken
-	checkToken := db.Where("token = ?", token).Where("type = ?", "reset_password").Find(&existingToken)
-	if checkToken.RowsAffected > 0 {
+	checkToken := db.Where("token = ?", token).Where("type = ?", "reset_password").Where("expired_at > ?", time.Now()).Find(&existingToken)
+	if checkToken.RowsAffected == 0 {
 		return "failed", fmt.Errorf("token not found")
 	}
 
 	//Check the existence first
-	user, isExists = FindUserById(string(existingToken.ID))
-	if isExists {
+	user = FindUserById(existingToken.UserId)
+	if user.ID != 0 {
 		//Update user
 		db.Model(&user).Where("id = ?", user.ID).UpdateColumns(&models.User{
 			Password: password,
 		})
 		//Remove all reset password token
-		db.Unscoped().Delete(&models.UserToken{}, "user_id = ?", user.ID)
-		// checkToken := db.Where("token = ?", token).Where("type = ?", "reset_password").Find(&existingToken)
+		db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 	}
 
 	return "success", nil
@@ -240,15 +242,14 @@ func _CheckUserByEmail(email string) (models.User, bool) {
 	return existingUser, false
 }
 
-func FindUserById(id string) (models.User, bool) {
+func FindUserById(id uint) models.User {
 	db := database.DB
+	var user models.User
 
-	var existingUser models.User
-	checkUser := db.Where("id = ?", id).Find(&existingUser)
-	if checkUser.RowsAffected > 0 {
-		return existingUser, true
-	}
-	return existingUser, false
+	db.Find(&user, "id = ?", id)
+
+	return user
+
 }
 
 func _DeleteRolesByUser(userId uint) {
