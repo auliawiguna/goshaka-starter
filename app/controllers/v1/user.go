@@ -26,7 +26,7 @@ func UserIndex(c *fiber.Ctx) error {
 	pagination.Sort = c.Query("sort")
 	users, err := repositories_v1.UserShowAll(pagination)
 
-	if !err {
+	if err {
 		return helpers.UnprocessableResponse(c, users, "error")
 	}
 	return helpers.SuccessResponse(c, users, "success")

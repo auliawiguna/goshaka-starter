@@ -19,7 +19,7 @@ func AuthRoute(router fiber.Router) {
 	// Login
 	auth.Post("/login", validator.LoginValidator, controllerV1.Login)
 	// Registration
-	auth.Post("/register", validator.CreateUserValidator, controllerV1.Register)
+	auth.Post("/register", validator.CreateUserValidator, middlewares.ThrottleByIp(60, 60), controllerV1.Register)
 	auth.Post("/validate-registration", validator.RegistrationValidator, controllerV1.ValidateRegistration)
 	auth.Post("/resend-registration-token", validator.ResendTokenValidator, controllerV1.ResendRegistrationToken)
 	// Forgot Password
