@@ -25,6 +25,7 @@
 
 ## Security Rules
 - In this boilerplate, we use stateless JWT
+- Email notification when user's profile is updated
 - To change your email address, you need to verify the changes via email
 - Implementation of rate limiter in auth routes
 - Implementation of mutex 

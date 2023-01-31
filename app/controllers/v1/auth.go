@@ -185,3 +185,24 @@ func MyProfile(c *fiber.Ctx) error {
 	return helpers.SuccessResponse(c, user, "success")
 
 }
+
+// @Security BearerAuth
+// @Summary Update Profile
+// @Description Update Profile
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	usersRequest	body	structs.ProfileUpdate	true	"email"
+// @Router /api/v1/auth/my-profile [put]
+func UpdateProfile(c *fiber.Ctx) error {
+	userId := c.Locals("user_id")
+	user, err := repositories_v1.UpdateProfile(c, fmt.Sprintf("%f", userId))
+
+	if err != nil {
+		return helpers.UnprocessableResponse(c, user, err.Error())
+	}
+
+	return helpers.SuccessResponse(c, user, "success")
+
+}

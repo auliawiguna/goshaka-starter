@@ -27,4 +27,5 @@ func AuthRoute(router fiber.Router) {
 	auth.Post("/reset-password", validator.ResetPasswordValidator, controllerV1.ResetPassword)
 	// My Profile
 	auth.Get("/my-profile", middlewares.ValidateJWT, controllerV1.MyProfile)
+	auth.Put("/my-profile", middlewares.ValidateJWT, validator.ProfileUpdateValidator, controllerV1.UpdateProfile)
 }

@@ -17,6 +17,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Show user by given ID
+//
+//	param id string
+//	return models.User
 func UserShow(id string) models.User {
 	db := database.DB
 	var user models.User
@@ -26,6 +30,10 @@ func UserShow(id string) models.User {
 	return user
 }
 
+// Handle user login
+//
+//	receiver c *fiber.Ctx
+//	return models.User, string, error
 func Login(c *fiber.Ctx) (models.User, string, error) {
 
 	var user models.User
@@ -453,6 +461,10 @@ func Register(c *fiber.Ctx) (models.User, error) {
 	return user, nil
 }
 
+// Show all users
+//
+//	receiver pagination helpers.Pagination
+//	return *helpers.Pagination, bool
 func UserShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
 	db := database.DB
 	var users []*models.User
@@ -464,6 +476,10 @@ func UserShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
 	return &pagination, error
 }
 
+// Create a users
+//
+//	param c *fiber.Ctx
+//	return models.User, error
 func UserCreate(c *fiber.Ctx) (models.User, error) {
 	db := database.DB
 
@@ -507,6 +523,11 @@ func UserCreate(c *fiber.Ctx) (models.User, error) {
 	return user, nil
 }
 
+// Update a users
+//
+//	param c *fiber.Ctx
+//	param id string
+//	return models.User, error
 func UserUpdate(c *fiber.Ctx, id string) (models.User, error) {
 	db := database.DB
 
@@ -533,13 +554,18 @@ func UserUpdate(c *fiber.Ctx, id string) (models.User, error) {
 		return user, fmt.Errorf("user is not exists")
 	}
 
-	db.Model(&user).Where("id = ?", id).UpdateColumns(&models.User{
+	var dataToUpdate = &models.User{
 		FirstName: first_name,
 		LastName:  last_name,
-		Password:  password,
 		Email:     email,
 		Username:  username,
-	})
+	}
+
+	if password != "" {
+		dataToUpdate.Password = password
+	}
+
+	db.Model(&user).Where("id = ?", id).UpdateColumns(dataToUpdate)
 
 	//Set Role
 	_ResetRole(user.ID, uint(role_id))
@@ -549,6 +575,11 @@ func UserUpdate(c *fiber.Ctx, id string) (models.User, error) {
 	return user, nil
 }
 
+// Delete a users
+//
+//	param c *fiber.Ctx
+//	param id string
+//	return models.User, error
 func UserDestroy(c *fiber.Ctx, id string) (models.User, error) {
 	db := database.DB
 	var user models.User
@@ -569,4 +600,73 @@ func UserDestroy(c *fiber.Ctx, id string) (models.User, error) {
 	err := db.Unscoped().Delete(&user).Error
 
 	return user, err
+}
+
+// Update user profile
+//
+//	param c *fiber.Ctx
+//	param id string
+//	return models.User, error
+func UpdateProfile(c *fiber.Ctx, id string) (models.User, error) {
+	db := database.DB
+
+	var user models.User
+	var userStructure structs.UserUpdate
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &userStructure)
+
+	if err != nil {
+		return user, fmt.Errorf("payload error")
+	}
+	email := helpers.SanitiseText(userStructure.Email)
+	password := helpers.SanitiseText(userStructure.Password)
+	first_name := helpers.SanitiseText(userStructure.FirstName)
+	last_name := helpers.SanitiseText(userStructure.LastName)
+
+	db.Find(&user, "id = ?", id)
+
+	if user.ID == 0 {
+		return user, fmt.Errorf("user is not exists")
+	}
+
+	var sendEmail bool = false
+	if first_name != user.FirstName || last_name != user.LastName {
+		sendEmail = true
+	}
+
+	if sendEmail {
+		emailData := struct {
+			NewFirstName string
+			NewLastName  string
+			OldFirstName string
+			OldLastName  string
+			AppUrl       string
+		}{
+			NewFirstName: first_name,
+			NewLastName:  last_name,
+			OldFirstName: user.FirstName,
+			OldLastName:  user.LastName,
+			AppUrl:       appConfig.GetEnv("APP_URL"),
+		}
+
+		helpers.SendMail(email, "Your account has been updated", "updated_account", emailData)
+	}
+
+	var dataToUpdate = &models.User{
+		FirstName: first_name,
+		LastName:  last_name,
+		Email:     email,
+	}
+
+	if password != "" {
+		dataToUpdate.Password = password
+	}
+
+	db.Model(&user).Where("id = ?", id).UpdateColumns(dataToUpdate)
+
+	db.Preload("RoleUser.Role").Find(&user, "id = ?", user.ID)
+
+	return user, nil
 }

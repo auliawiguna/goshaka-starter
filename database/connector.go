@@ -122,6 +122,7 @@ func Connect() error {
 		}
 	}
 	DB.AutoMigrate(&model.UserToken{})
+	DB.AutoMigrate(&model.ChangeEmail{})
 
 	return nil
 }
