@@ -35,5 +35,6 @@
 ![image](https://user-images.githubusercontent.com/26473549/213926419-3d2d4b53-3060-48e6-9c26-ebb86c0466b2.png)
 
 ## References
+- [https://dev.to/percoguru/getting-started-with-apis-in-golang-feat-fiber-and-gorm-2n34](https://dev.to/percoguru/getting-started-with-apis-in-golang-feat-fiber-and-gorm-2n34)
 - [Email template](https://codepen.io/mightyteja/pen/xxxjXqJ)
 - Inspired by [Fiber backend template for Create Go App CLI](https://github.com/create-go-app/fiber-go-template) ^^
