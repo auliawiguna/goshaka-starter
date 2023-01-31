@@ -2,6 +2,7 @@ package validator
 
 import (
 	"goshaka/app/structs"
+	"goshaka/helpers"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +27,7 @@ func CreateUserValidator(c *fiber.Ctx) error {
 			el.Value = err.Param()
 			errors = append(errors, &el)
 		}
-		return c.Status(fiber.StatusBadRequest).JSON(errors)
+		return helpers.UnprocessableResponse(c, errors, "unprocessable entity")
 	}
 
 	return c.Next()
@@ -51,7 +52,7 @@ func RegistrationValidator(c *fiber.Ctx) error {
 			el.Value = err.Param()
 			errors = append(errors, &el)
 		}
-		return c.Status(fiber.StatusBadRequest).JSON(errors)
+		return helpers.UnprocessableResponse(c, errors, "unprocessable entity")
 	}
 
 	return c.Next()
@@ -76,7 +77,7 @@ func ResendTokenValidator(c *fiber.Ctx) error {
 			el.Value = err.Param()
 			errors = append(errors, &el)
 		}
-		return c.Status(fiber.StatusBadRequest).JSON(errors)
+		return helpers.UnprocessableResponse(c, errors, "unprocessable entity")
 	}
 
 	return c.Next()

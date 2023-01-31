@@ -5,7 +5,7 @@ import (
 	"goshaka/app/models"
 	appConfig "goshaka/configs"
 	"goshaka/database"
-	"net/http"
+	"goshaka/helpers"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
@@ -25,10 +25,7 @@ func ValidateJWT(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-			"error": true,
-			"data":  "Unauthorised",
-		})
+		return helpers.UnauthorisedResponse(c, nil, "unauthorised")
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -37,10 +34,7 @@ func ValidateJWT(c *fiber.Ctx) error {
 	}
 
 	if !token.Valid {
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-			"error": true,
-			"data":  "Invalid Token",
-		})
+		return helpers.UnauthorisedResponse(c, nil, "invalid token")
 	}
 
 	return c.Next()
@@ -64,10 +58,7 @@ func RoleAuth(roles []string) func(c *fiber.Ctx) error {
 		db.Table("roles").Select("roles.*").Where("roles.id IN (?)", rolesIds).Where("name IN (?)", roles).Scan(&roleArray)
 
 		if roleArray == nil {
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-				"error": true,
-				"data":  "Insufficient Permission",
-			})
+			return helpers.UnauthorisedResponse(c, nil, "insufficient permission")
 		}
 
 		return c.Next()
@@ -88,19 +79,13 @@ func PermissionAuth(permissions []string) func(c *fiber.Ctx) error {
 		}
 
 		if roles == nil {
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-				"error": true,
-				"data":  "Unauthorised Action",
-			})
+			return helpers.UnauthorisedResponse(c, nil, "unauthorised action")
 		}
 		var permissionArray []models.Permission
 		db.Table("permissions").Select("permissions.*").Joins("JOIN permission_role ON permission_role.permission_id = permissions.id").Where("permission_role.role_id IN (?)", roles).Where("permissions.name IN (?)", permissions).Scan(&permissionArray)
 
 		if permissionArray == nil {
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-				"error": true,
-				"data":  "Insufficient Permission",
-			})
+			return helpers.UnauthorisedResponse(c, nil, "insufficient permission")
 		}
 
 		return c.Next()

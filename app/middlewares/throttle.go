@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"net/http"
+	"goshaka/helpers"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -26,10 +26,7 @@ func ThrottleByKey(key string, max int, sec int) func(c *fiber.Ctx) error {
 			return key
 		},
 		LimitReached: func(c *fiber.Ctx) error {
-			return c.Status(http.StatusTooManyRequests).JSON(fiber.Map{
-				"error":   true,
-				"message": "Too Many Request",
-			})
+			return helpers.TooManyRequestResponse(c)
 		},
 	})
 }
@@ -52,10 +49,7 @@ func ThrottleByKeyAndIP(key string, max int, sec int) func(c *fiber.Ctx) error {
 			return string(c.IP()) + key
 		},
 		LimitReached: func(c *fiber.Ctx) error {
-			return c.Status(http.StatusTooManyRequests).JSON(fiber.Map{
-				"error":   true,
-				"message": "Too Many Request",
-			})
+			return helpers.TooManyRequestResponse(c)
 		},
 	})
 }
@@ -78,10 +72,7 @@ func ThrottleByIp(max int, sec int) func(c *fiber.Ctx) error {
 			return c.IP()
 		},
 		LimitReached: func(c *fiber.Ctx) error {
-			return c.Status(http.StatusTooManyRequests).JSON(fiber.Map{
-				"error":   true,
-				"message": "Too Many Request",
-			})
+			return helpers.TooManyRequestResponse(c)
 		},
 	})
 }
