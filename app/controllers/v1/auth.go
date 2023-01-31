@@ -51,6 +51,20 @@ func Login(c *fiber.Ctx) error {
 // @Param	loginRequest	body	structs.UserCreate	true	"email"
 // @Router /api/v1/auth/register [post]
 func Register(c *fiber.Ctx) error {
+	var userCreateStructure structs.UserCreate
+
+	body := c.Body()
+	err := json.Unmarshal(body, &userCreateStructure)
+
+	if err != nil {
+		return helpers.UnprocessableResponse(c, err, err.Error())
+	}
+
+	var mutexKey string = "register" + userCreateStructure.Email
+	//Use mutex
+	helpers.LockThread(mutexKey)
+	defer helpers.UnlockThread(mutexKey)
+
 	user, err := repositories_v1.Register(c)
 
 	if err != nil {

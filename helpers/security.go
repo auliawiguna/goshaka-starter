@@ -20,6 +20,7 @@ var (
 	RateLimiter = make(map[string]int64)
 	PointLimit  = make(map[string]int64)
 	Mutex       sync.Mutex
+	MutexMap    = make(map[string]*sync.Mutex)
 )
 
 // Throttle function/request by key
@@ -134,4 +135,28 @@ func DecryptText(encryptedText string) (string, error) {
 func SanitiseText(str string) string {
 	sanitise := bluemonday.UGCPolicy()
 	return sanitise.Sanitize(str)
+}
+
+// To use mutex lock using key
+//
+//	param key string
+//	return void
+func LockThread(key string) {
+	mutex, ok := MutexMap[key]
+	if !ok {
+		mutex = &sync.Mutex{}
+		MutexMap[key] = mutex
+	}
+	mutex.Lock()
+}
+
+// To unlock mutex using key
+//
+//	param key string
+//	return void
+func UnlockThread(key string) {
+	mutex, ok := MutexMap[key]
+	if ok {
+		mutex.Unlock()
+	}
 }
