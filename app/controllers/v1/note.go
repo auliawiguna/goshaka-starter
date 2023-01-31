@@ -23,12 +23,9 @@ func NoteIndex(c *fiber.Ctx) error {
 	pagination.Limit, _ = strconv.Atoi(c.Query("limit"))
 	pagination.Page, _ = strconv.Atoi(c.Query("page"))
 	pagination.Sort = c.Query("sort")
-	notes, err := repositories_v1.NoteShowAll(pagination)
+	notes, _ := repositories_v1.NoteShowAll(pagination)
 
-	return c.JSON(fiber.Map{
-		"error": err,
-		"data":  notes,
-	})
+	return helpers.SuccessResponse(c, notes, "success")
 }
 
 // @Summary Show detail note
@@ -43,15 +40,9 @@ func NoteShow(c *fiber.Ctx) error {
 	note := repositories_v1.NoteShow(c.Params("id"))
 
 	if note.ID == 0 {
-		return c.Status(404).JSON(fiber.Map{
-			"error": true,
-			"data":  nil,
-		})
+		return helpers.NotFoundResponse(c, note, "not found")
 	}
-	return c.Status(404).JSON(fiber.Map{
-		"error": false,
-		"data":  note,
-	})
+	return helpers.SuccessResponse(c, note, "success")
 }
 
 // @Summary Create new note
@@ -65,15 +56,9 @@ func NoteShow(c *fiber.Ctx) error {
 func NoteStore(c *fiber.Ctx) error {
 	note, err := repositories_v1.NoteCreate(c)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, note, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  note,
-	})
+	return helpers.SuccessResponse(c, note, "success")
 }
 
 // @Summary Update existing note
@@ -89,15 +74,9 @@ func NoteUpdate(c *fiber.Ctx) error {
 	id := c.Params("id")
 	note, err := repositories_v1.NoteUpdate(c, id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, note, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  note,
-	})
+	return helpers.SuccessResponse(c, note, "success")
 }
 
 // @Summary Delete existing note
@@ -112,13 +91,7 @@ func NoteDestroy(c *fiber.Ctx) error {
 	id := c.Params("id")
 	note, err := repositories_v1.NoteDestroy(c, id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, note, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  note,
-	})
+	return helpers.SuccessResponse(c, note, "success")
 }
