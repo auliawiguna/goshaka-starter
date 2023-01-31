@@ -1,8 +1,10 @@
 package controller_v1
 
 import (
+	"encoding/json"
 	"fmt"
 	repositories_v1 "goshaka/app/repositories"
+	"goshaka/app/structs"
 	"goshaka/helpers"
 	"strconv"
 
@@ -108,6 +110,21 @@ func ResendRegistrationToken(c *fiber.Ctx) error {
 // @Param	loginRequest	body	structs.RequestResetPassword	true	"email"
 // @Router /api/v1/auth/request-reset-password [post]
 func RequestResetPassword(c *fiber.Ctx) error {
+	var requestResetPasswordStructure structs.RequestResetPassword
+
+	body := c.Body()
+	err := json.Unmarshal(body, &requestResetPasswordStructure)
+
+	if err != nil {
+		return helpers.UnprocessableResponse(c, err, err.Error())
+	}
+
+	//Throttle, 2 requests per email per 60 secs
+	var rateLimit bool = helpers.RateLimit("requestResetPass"+requestResetPasswordStructure.Email, 2, 60)
+	if !rateLimit {
+		return helpers.TooManyRequestResponse(c)
+	}
+
 	msg, err := repositories_v1.RequestResetPassword(c)
 
 	if err != nil {

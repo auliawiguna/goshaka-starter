@@ -60,3 +60,16 @@ func NotFoundResponse(c *fiber.Ctx, data interface{}, message string) error {
 		"message": message,
 	})
 }
+
+// Handle http 429 response
+//
+//	param c *fiber.Ctx
+//	param data interface{}
+//	param message string
+//	return message string
+func TooManyRequestResponse(c *fiber.Ctx) error {
+	return c.Status(http.StatusTooManyRequests).JSON(fiber.Map{
+		"error":   true,
+		"message": "too many request",
+	})
+}

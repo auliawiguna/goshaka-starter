@@ -9,10 +9,44 @@ import (
 	"fmt"
 	"goshaka/configs"
 	"io"
+	"sync"
+	"time"
 
 	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var (
+	RateLimiter = make(map[string]int64)
+	PointLimit  = make(map[string]int64)
+	Mutex       sync.Mutex
+)
+
+// Throttle function/request by key
+//
+//	param key string
+//	param maxAttempt int
+//	param maxTimeInSeconds int
+//	return bool
+func RateLimit(key string, maxAttempt int, maxTimeInSeconds int) bool {
+	Mutex.Lock()
+	defer Mutex.Unlock()
+
+	now := time.Now().Unix()
+
+	if v, ok := RateLimiter[key]; ok && now-v < int64(maxTimeInSeconds) {
+		RateLimiter[key]++
+		PointLimit[key]++
+		if PointLimit[key] > int64(maxAttempt) {
+			return false
+		}
+	} else {
+		RateLimiter[key] = now
+		PointLimit[key] = 1
+	}
+
+	return true
+}
 
 // Compare hash and a plain text, will returns true if hash is match
 //
