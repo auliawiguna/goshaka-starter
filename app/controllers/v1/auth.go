@@ -119,8 +119,8 @@ func RequestResetPassword(c *fiber.Ctx) error {
 		return helpers.UnprocessableResponse(c, err, err.Error())
 	}
 
-	//Throttle, 2 requests per email per 60 secs
-	var rateLimit bool = helpers.RateLimit("requestResetPass"+requestResetPasswordStructure.Email, 2, 60)
+	//Throttle, 1 requests per email per 15 minutes
+	var rateLimit bool = helpers.RateLimit("requestResetPass"+requestResetPasswordStructure.Email, 1, 60*15)
 	if !rateLimit {
 		return helpers.TooManyRequestResponse(c)
 	}
