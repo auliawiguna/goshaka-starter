@@ -704,3 +704,64 @@ func UpdateProfile(c *fiber.Ctx, id string) (models.User, error) {
 
 	return user, nil
 }
+
+// Update email address
+//
+//	param c *fiber.Ctx
+//	param id string
+//	return models.User, error
+func UpdateEmailAddress(c *fiber.Ctx, id string) (models.User, error) {
+	db := database.DB
+
+	var user models.User
+	var emailStructure structs.EmailUpdate
+	var token models.ChangeEmail
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &emailStructure)
+
+	if err != nil {
+		return user, fmt.Errorf("payload error")
+	}
+
+	tokenString := helpers.SanitiseText(emailStructure.Token)
+
+	checkToken := db.Where("token = ?", tokenString).Where("expired_at > ?", time.Now()).Find(&token)
+	if checkToken.RowsAffected == 0 {
+		return user, fmt.Errorf("token is not exists")
+	}
+
+	db.Find(&user, "id = ?", token.UserId)
+
+	if user.ID == 0 {
+		return user, fmt.Errorf("user is not exists")
+	}
+
+	var dataToUpdate = &models.User{
+		Email: token.NewEmail,
+	}
+
+	db.Model(&user).Where("id = ?", id).UpdateColumns(dataToUpdate)
+	db.Unscoped().Delete(&models.ChangeEmail{}, "user_id = ?", user.ID)
+
+	emailData := struct {
+		FirstName   string
+		NewEmail    string
+		OldEmail    string
+		FrontendUrl string
+		AppUrl      string
+	}{
+		FirstName:   user.FirstName,
+		NewEmail:    token.NewEmail,
+		OldEmail:    token.OldEmail,
+		FrontendUrl: appConfig.GetEnv("FRONTEND_URL"),
+		AppUrl:      appConfig.GetEnv("APP_URL"),
+	}
+	helpers.SendMail(token.NewEmail, "Your email address has been updated", "updated_email_address", emailData)
+	helpers.SendMail(token.OldEmail, "Your email address has been updated", "updated_email_address", emailData)
+
+	db.Preload("RoleUser.Role").Find(&user, "id = ?", user.ID)
+
+	return user, nil
+}

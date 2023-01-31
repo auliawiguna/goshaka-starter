@@ -286,6 +286,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/auth/validate-new-email": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Validate new email address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Validate new email address",
+                "parameters": [
+                    {
+                        "description": "email",
+                        "name": "usersRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/structs.EmailUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/auth/validate-registration": {
             "post": {
                 "description": "Validate registration",
@@ -1183,6 +1223,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "structs.EmailUpdate": {
+            "type": "object",
+            "required": [
+                "token"
+            ],
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "structs.Login": {
             "type": "object",
             "required": [

@@ -28,4 +28,5 @@ func AuthRoute(router fiber.Router) {
 	// My Profile
 	auth.Get("/my-profile", middlewares.ValidateJWT, controllerV1.MyProfile)
 	auth.Put("/my-profile", middlewares.ValidateJWT, validator.ProfileUpdateValidator, controllerV1.UpdateProfile)
+	auth.Post("/validate-new-email", middlewares.ValidateJWT, validator.EmailUpdateValidator, controllerV1.UpdateEmail)
 }

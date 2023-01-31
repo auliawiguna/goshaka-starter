@@ -206,3 +206,30 @@ func UpdateProfile(c *fiber.Ctx) error {
 	return helpers.SuccessResponse(c, user, "success")
 
 }
+
+// @Security BearerAuth
+// @Summary Validate new email address
+// @Description Validate new email address
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	usersRequest	body	structs.EmailUpdate	true	"email"
+// @Router /api/v1/auth/validate-new-email [post]
+func UpdateEmail(c *fiber.Ctx) error {
+	userId := c.Locals("user_id")
+
+	var mutexKey string = "updateEmail" + fmt.Sprintf("%f", userId)
+	//Use mutex
+	helpers.LockThread(mutexKey)
+	defer helpers.UnlockThread(mutexKey)
+
+	user, err := repositories_v1.UpdateEmailAddress(c, fmt.Sprintf("%f", userId))
+
+	if err != nil {
+		return helpers.UnprocessableResponse(c, user, err.Error())
+	}
+
+	return helpers.SuccessResponse(c, user, "success")
+
+}
