@@ -73,3 +73,16 @@ func TooManyRequestResponse(c *fiber.Ctx) error {
 		"message": "too many request",
 	})
 }
+
+// Handle http bad request response
+//
+//	param c *fiber.Ctx
+//	param data interface{}
+//	param message string
+//	return message string
+func BadRequestResponse(c *fiber.Ctx) error {
+	return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+		"error":   true,
+		"message": "too many request",
+	})
+}

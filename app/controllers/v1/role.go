@@ -24,12 +24,9 @@ func RoleIndex(c *fiber.Ctx) error {
 	pagination.Limit, _ = strconv.Atoi(c.Query("limit"))
 	pagination.Page, _ = strconv.Atoi(c.Query("page"))
 	pagination.Sort = c.Query("sort")
-	roles, err := repositories_v1.RoleShowAll(pagination)
+	roles, _ := repositories_v1.RoleShowAll(pagination)
 
-	return c.JSON(fiber.Map{
-		"error": err,
-		"data":  roles,
-	})
+	return helpers.SuccessResponse(c, roles, "success")
 }
 
 // @Security BearerAuth
@@ -45,15 +42,9 @@ func RoleShow(c *fiber.Ctx) error {
 	role := repositories_v1.RoleShow(c.Params("id"))
 
 	if role.ID == 0 {
-		return c.Status(404).JSON(fiber.Map{
-			"error": true,
-			"data":  nil,
-		})
+		return helpers.NotFoundResponse(c, role, "not found")
 	}
-	return c.Status(404).JSON(fiber.Map{
-		"error": false,
-		"data":  role,
-	})
+	return helpers.SuccessResponse(c, role, "success")
 }
 
 // @Security BearerAuth
@@ -68,15 +59,9 @@ func RoleShow(c *fiber.Ctx) error {
 func RoleStore(c *fiber.Ctx) error {
 	role, err := repositories_v1.RoleCreate(c)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, role, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  role,
-	})
+	return helpers.SuccessResponse(c, role, "success")
 }
 
 // @Security BearerAuth
@@ -92,16 +77,11 @@ func RoleStore(c *fiber.Ctx) error {
 func RoleUpdate(c *fiber.Ctx) error {
 	id := c.Params("id")
 	role, err := repositories_v1.RoleUpdate(c, id)
+
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, role, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  role,
-	})
+	return helpers.SuccessResponse(c, role, "success")
 }
 
 // @Security BearerAuth
@@ -117,13 +97,7 @@ func RoleDestroy(c *fiber.Ctx) error {
 	id := c.Params("id")
 	role, err := repositories_v1.RoleDestroy(c, id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, role, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  role,
-	})
+	return helpers.SuccessResponse(c, role, "success")
 }

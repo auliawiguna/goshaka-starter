@@ -24,12 +24,9 @@ func PermissionIndex(c *fiber.Ctx) error {
 	pagination.Limit, _ = strconv.Atoi(c.Query("limit"))
 	pagination.Page, _ = strconv.Atoi(c.Query("page"))
 	pagination.Sort = c.Query("sort")
-	permissions, err := repositories_v1.PermissionShowAll(pagination)
+	permissions, _ := repositories_v1.PermissionShowAll(pagination)
 
-	return c.JSON(fiber.Map{
-		"error": err,
-		"data":  permissions,
-	})
+	return helpers.SuccessResponse(c, permissions, "success")
 }
 
 // @Security BearerAuth
@@ -45,15 +42,9 @@ func PermissionShow(c *fiber.Ctx) error {
 	permission := repositories_v1.PermissionShow(c.Params("id"))
 
 	if permission.ID == 0 {
-		return c.Status(404).JSON(fiber.Map{
-			"error": true,
-			"data":  nil,
-		})
+		return helpers.NotFoundResponse(c, permission, "not found")
 	}
-	return c.Status(404).JSON(fiber.Map{
-		"error": false,
-		"data":  permission,
-	})
+	return helpers.SuccessResponse(c, permission, "success")
 }
 
 // @Security BearerAuth
@@ -68,15 +59,9 @@ func PermissionShow(c *fiber.Ctx) error {
 func PermissionStore(c *fiber.Ctx) error {
 	permission, err := repositories_v1.PermissionCreate(c)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, permission, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  permission,
-	})
+	return helpers.SuccessResponse(c, permission, "success")
 }
 
 // @Security BearerAuth
@@ -93,15 +78,9 @@ func PermissionUpdate(c *fiber.Ctx) error {
 	id := c.Params("id")
 	permission, err := repositories_v1.PermissionUpdate(c, id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, permission, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  permission,
-	})
+	return helpers.SuccessResponse(c, permission, "success")
 }
 
 // @Security BearerAuth
@@ -117,13 +96,7 @@ func PermissionDestroy(c *fiber.Ctx) error {
 	id := c.Params("id")
 	permission, err := repositories_v1.PermissionDestroy(c, id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": true,
-			"data":  err.Error(),
-		})
+		return helpers.UnprocessableResponse(c, permission, err.Error())
 	}
-	return c.JSON(fiber.Map{
-		"error": false,
-		"data":  permission,
-	})
+	return helpers.SuccessResponse(c, permission, "success")
 }
