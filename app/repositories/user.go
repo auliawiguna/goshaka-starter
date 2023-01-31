@@ -654,10 +654,44 @@ func UpdateProfile(c *fiber.Ctx, id string) (models.User, error) {
 		helpers.SendMail(email, "Your account has been updated", "updated_account", emailData)
 	}
 
+	var mustVerifyChangeEmail bool = false
+	if email != user.Email {
+		mustVerifyChangeEmail = true
+	}
+
+	if mustVerifyChangeEmail {
+		token := helpers.RandomNumber(6)
+
+		verifyEmailData := struct {
+			FirstName   string
+			OldEmail    string
+			NewEmail    string
+			Token       string
+			AppUrl      string
+			FrontendUrl string
+		}{
+			FirstName:   user.FirstName,
+			OldEmail:    user.Email,
+			NewEmail:    email,
+			Token:       string(token),
+			AppUrl:      appConfig.GetEnv("APP_URL"),
+			FrontendUrl: appConfig.GetEnv("FRONTEND_URL"),
+		}
+
+		db.Create(&models.ChangeEmail{
+			UserId:    user.ID,
+			Token:     token,
+			ExpiredAt: time.Now().Add(time.Hour * 1), // 1 hour
+			OldEmail:  user.Email,
+			NewEmail:  email,
+		})
+		helpers.SendMail(user.Email, "Verify your email change", "new_email_verification", verifyEmailData)
+	}
+
 	var dataToUpdate = &models.User{
 		FirstName: first_name,
 		LastName:  last_name,
-		Email:     email,
+		// Email:     email,
 	}
 
 	if password != "" {
