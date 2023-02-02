@@ -9,3 +9,6 @@ run: build
 
 watch:
 	reflex -s -r '\.go$$' make run
+
+runtest:
+	go test ./test -v

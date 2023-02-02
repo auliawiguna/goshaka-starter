@@ -4,6 +4,7 @@
 
 
 ## Setup
+- Copy `.env.example` to `.env`, adjust the values, and copy the `.env` to `test` folder
 - To run development mode, execute `make watch`
 - [Linux] Install `swag` by execute `go install github.com/swaggo/swag/cmd/swag@latest`
 - Generate swagger docs by execute `make swagger`
