@@ -18,6 +18,7 @@
 - Example of CRUD function
 - Verification on email change
 - Role Permission Based Access Control inspired by [Spatie Laravel Permission Matrix](https://github.com/spatie/laravel-permission)
+- Pagination
 
 ## Capabilities
 - Auto migration
