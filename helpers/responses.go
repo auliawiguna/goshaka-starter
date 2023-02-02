@@ -11,9 +11,9 @@ import (
 //	param c *fiber.Ctx
 //	param data interface{}
 //	param message string
-//	return message string
+//	return error
 func SuccessResponse(c *fiber.Ctx, data interface{}, message string) error {
-	return c.Status(http.StatusAccepted).JSON(fiber.Map{
+	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"error":   false,
 		"data":    data,
 		"message": message,
@@ -25,7 +25,7 @@ func SuccessResponse(c *fiber.Ctx, data interface{}, message string) error {
 //	param c *fiber.Ctx
 //	param data interface{}
 //	param message string
-//	return message string
+//	return error
 func UnprocessableResponse(c *fiber.Ctx, data interface{}, message string) error {
 	return c.Status(http.StatusUnprocessableEntity).JSON(fiber.Map{
 		"error":   true,
@@ -39,7 +39,7 @@ func UnprocessableResponse(c *fiber.Ctx, data interface{}, message string) error
 //	param c *fiber.Ctx
 //	param data interface{}
 //	param message string
-//	return message string
+//	return error
 func UnauthorisedResponse(c *fiber.Ctx, data interface{}, message string) error {
 	return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 		"error":   true,
@@ -53,7 +53,7 @@ func UnauthorisedResponse(c *fiber.Ctx, data interface{}, message string) error 
 //	param c *fiber.Ctx
 //	param data interface{}
 //	param message string
-//	return message string
+//	return error
 func NotFoundResponse(c *fiber.Ctx, data interface{}, message string) error {
 	return c.Status(http.StatusNotFound).JSON(fiber.Map{
 		"error":   true,
@@ -66,7 +66,7 @@ func NotFoundResponse(c *fiber.Ctx, data interface{}, message string) error {
 //	param c *fiber.Ctx
 //	param data interface{}
 //	param message string
-//	return message string
+//	return error
 func TooManyRequestResponse(c *fiber.Ctx) error {
 	return c.Status(http.StatusTooManyRequests).JSON(fiber.Map{
 		"error":   true,
@@ -79,10 +79,23 @@ func TooManyRequestResponse(c *fiber.Ctx) error {
 //	param c *fiber.Ctx
 //	param data interface{}
 //	param message string
-//	return message string
+//	return error
 func BadRequestResponse(c *fiber.Ctx) error {
 	return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 		"error":   true,
 		"message": "too many request",
+	})
+}
+
+// Handle http internal server error response
+//
+//	param c *fiber.Ctx
+//	param data interface{}
+//	param message string
+//	return error
+func InternalServerErorResponse(c *fiber.Ctx, message string) error {
+	return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+		"error":   true,
+		"message": message,
 	})
 }
