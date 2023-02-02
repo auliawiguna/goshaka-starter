@@ -13,7 +13,7 @@ import (
 //	param message string
 //	return message string
 func SuccessResponse(c *fiber.Ctx, data interface{}, message string) error {
-	return c.Status(http.StatusAccepted).JSON(fiber.Map{
+	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"error":   false,
 		"data":    data,
 		"message": message,
