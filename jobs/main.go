@@ -15,8 +15,8 @@ func RunCron() {
 		fmt.Println("Get up! Get to work!")
 	})
 
-	sampleJob.Every(10).Seconds().Do(func() {
-		fmt.Println("Run every 10 secs")
+	sampleJob.Every(10).Minutes().Do(func() {
+		fmt.Println("Run every 10 minutes")
 	})
 
 	sampleJob.StartAsync()
