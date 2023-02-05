@@ -28,6 +28,8 @@ func main() {
 
 	//Database
 	appDatabase.Connect()
+	db, _ := appDatabase.DB.DB()
+	defer db.Close()
 
 	//Apply default middleware
 	appMiddleware.DefaultMiddleware(app)
