@@ -6,6 +6,7 @@ import (
 	appConfig "goshaka/configs"
 	appDatabase "goshaka/database"
 	appHelper "goshaka/helpers"
+	"goshaka/jobs"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -35,6 +36,9 @@ func main() {
 	apiRoutes.MainRoutes(app)
 	apiRoutes.ApiRoutes(app)
 	apiRoutes.StaticFile(app)
+
+	//Run cronjob
+	jobs.RunCron()
 
 	if appConfig.GetEnv("ENV") == "dev" {
 		appHelper.StartServer(app)

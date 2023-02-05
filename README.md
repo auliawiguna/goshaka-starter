@@ -22,6 +22,7 @@
 - Verification on email change
 - Role Permission Based Access Control inspired by [Spatie Laravel Permission Matrix](https://github.com/spatie/laravel-permission)
 - Pagination
+- Cronjob using [gocron](https://github.com/go-co-op/gocron)
 
 ## Capabilities
 - Auto migration
