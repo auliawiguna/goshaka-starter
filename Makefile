@@ -9,3 +9,9 @@ run: build
 
 watch:
 	reflex -s -r '\.go$$' make run
+
+unit_test:
+	go test ./test/unit -v
+
+api_test:
+	go test ./test/api -v
