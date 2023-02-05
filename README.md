@@ -12,7 +12,8 @@
 - Generate swagger docs by execute `make swagger`
 
 ## Features
-- Login
+- Log in using username and password
+- Log in using Google One Tap, please see the example in the folder `public/test_google_one_tap.html` to use Google One Tap in the front end, and endpoint `/api/v1/auth/google-one-tap` for the backend 
 - Register
 - Verify Registration
 - Reset Password
