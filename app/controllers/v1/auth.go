@@ -166,6 +166,37 @@ func ResetPassword(c *fiber.Ctx) error {
 	return helpers.SuccessResponse(c, err, msg)
 }
 
+// @Summary Handle Google One Tap login
+// @Description Handle Google One Tap login
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	loginRequest	body	structs.GoogleOneTap	true	"email"
+// @Router /api/v1/auth/google-one-tap [post]
+func GoogleOneTap(c *fiber.Ctx) error {
+	user, jwt, err := repositories_v1.LoginUsingGooleOneTap(c)
+
+	if err != nil {
+		return helpers.UnprocessableResponse(c, user, err.Error())
+	}
+	c.Cookie(&fiber.Cookie{
+		Name:  "token",
+		Value: jwt,
+	})
+	c.Cookie(&fiber.Cookie{
+		Name:  "user_id",
+		Value: strconv.FormatUint(uint64(user.ID), 10),
+	})
+
+	res := map[string]interface{}{
+		"user":         user,
+		"access_token": jwt,
+	}
+
+	return helpers.SuccessResponse(c, res, "success")
+}
+
 // @Security BearerAuth
 // @Summary My Profile
 // @Description My Profile

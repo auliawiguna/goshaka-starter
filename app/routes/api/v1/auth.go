@@ -25,6 +25,8 @@ func AuthRoute(router fiber.Router) {
 	// Forgot Password
 	auth.Post("/request-reset-password", middlewares.ThrottleByKeyAndIP("request-reset-password", 60, 60), validator.RequestResetPasswordValidator, controllerV1.RequestResetPassword)
 	auth.Post("/reset-password", validator.ResetPasswordValidator, controllerV1.ResetPassword)
+	// Handle Google One Tap login
+	auth.Post("/google-one-tap", validator.GoogleOneTap, controllerV1.GoogleOneTap)
 	// My Profile
 	auth.Get("/my-profile", middlewares.ValidateJWT, controllerV1.MyProfile)
 	auth.Put("/my-profile", middlewares.ValidateJWT, validator.ProfileUpdateValidator, controllerV1.UpdateProfile)

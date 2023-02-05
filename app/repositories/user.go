@@ -30,6 +30,43 @@ func UserShow(id string) models.User {
 	return user
 }
 
+// Handle user login using google one tap
+func LoginUsingGooleOneTap(c *fiber.Ctx) (models.User, string, error) {
+	var user models.User
+	var oneTapStructure structs.GoogleOneTap
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &oneTapStructure)
+
+	if err != nil {
+		return user, "", fmt.Errorf("payload error")
+	}
+	idToken := helpers.SanitiseText(oneTapStructure.IdToken)
+
+	tokenInfo, err := helpers.VerifyIdToken(c.Context(), idToken)
+
+	if err != nil {
+		return user, "", fmt.Errorf(err.Error())
+	}
+
+	var email string = tokenInfo.Email
+	db := database.DB
+	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
+
+	if user.ID == 0 {
+		//Remove all reset password token
+		db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
+
+		return user, "", fmt.Errorf("credential cannot be found")
+	}
+
+	//Remove all reset password token
+	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
+
+	return GenerateJwt(user)
+}
+
 // Handle user login
 //
 //	receiver c *fiber.Ctx
@@ -52,14 +89,14 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	db := database.DB
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
 
-	//Remove all reset password token
-	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
-
 	errHash := helpers.CompareHash(user.Password, password)
 
 	if !errHash {
 		return user, "", fmt.Errorf("credential cannot be found")
 	}
+
+	//Remove all reset password token
+	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 
 	return GenerateJwt(user)
 }
