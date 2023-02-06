@@ -24,7 +24,10 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	app := fiber.New()
+	config := appConfig.FiberConfig()
+
+	// Define a new Fiber app with config.
+	app := fiber.New(config)
 
 	//Database
 	appDatabase.Connect()
