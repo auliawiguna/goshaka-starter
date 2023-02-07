@@ -24,6 +24,32 @@
 - Role Permission Based Access Control inspired by [Spatie Laravel Permission Matrix](https://github.com/spatie/laravel-permission)
 - Pagination
 - Cronjob using [gocron](https://github.com/go-co-op/gocron)
+- Upload file to AWS S3
+
+## Using rate limiter
+We have 3 rate limiters here:
+- ThrottleByIp, this rate limiter will limits requests by the user's IP, if you are using Nginx, please make sure that the x-real-ip header is exposed to the back end
+- ThrottleByKeyAndIP, this rate limiter will limit requests by the user's IP and a custom key, for example, if you need to rate limit an endpoint to register, you may use this rate limiter by ThrottleByKeyAndIP("register", 60, 60). It will limits request from an IP with the key "register" to only 60 times each 60 seconds
+- ThrottleByKey, this rate limiter will limit requests by a custom key, for example, if you need to rate limit an endpoint to register, you may use this rate limiter by ThrottleByKey("register", 60, 60). It will limits request from any IP with the key "register" to only 60 times each 60 seconds
+For the real example, you may open `app/routes/api/v1/auth.go`
+
+## Protect a route using JWT
+You can use `PermissionAuth` middleware to protect a URL by the current user's permissions. It means that the users must have particular permission(s) in order to access the protected routes.
+You need to import `goshaka/app/middlewares` and then add the `middlewares.PermissionAuth` middleware as a route handler, 
+you can see the example in `app/routes/api/v1/user.go`.
+For example `middlewares.PermissionAuth([]string{"user-read"})` , it means in order to access a particular route, a user must have permission `user-read`
+
+## Protect a route using user's permission checker 
+You can use `PermissionAuth` middleware to protect a URL by the current user's permissions. It means that the users must have particular permission(s) in order to access the protected routes.
+You need to import `goshaka/app/middlewares` and then add the `middlewares.PermissionAuth` middleware as a route handler, 
+you can see the example in `app/routes/api/v1/user.go`.
+For example `middlewares.PermissionAuth([]string{"user-read"})` , it means in order to access particular route, a user must have permission `user-read`
+
+## Protect a route using user's role checker 
+You can use `RoleAuth` middleware to protect a URL from the current user's roles. It means that the users must have a particular role(s) in order to access the protected routes.
+You need to import `goshaka/app/middlewares` and then add the `middlewares.RoleAuth` middleware as a route handler, 
+you can see the example in `app/routes/api/v1/user.go`.
+For example `middlewares.RoleAuth([]string{"admin"})` , it means in order to access the particular route, a user must have the role `admin`
 
 ## Capabilities
 - Auto migration
@@ -47,3 +73,4 @@
 - [https://dev.to/percoguru/getting-started-with-apis-in-golang-feat-fiber-and-gorm-2n34](https://dev.to/percoguru/getting-started-with-apis-in-golang-feat-fiber-and-gorm-2n34)
 - [Email template](https://codepen.io/mightyteja/pen/xxxjXqJ)
 - Inspired by [Fiber backend template for Create Go App CLI](https://github.com/create-go-app/fiber-go-template) ^^
+- https://medium.com/spankie/upload-images-to-aws-s3-bucket-in-a-golang-web-application-2612bea70dd8

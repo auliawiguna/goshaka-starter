@@ -17,7 +17,6 @@ import (
 // @contact.name Aulia Wiguna
 // @contact.url https://github.com/auliawiguna/
 // @contact.email wigunaahmadaulia@gmail.com
-// @host 127.0.0.1:3000
 // @BasePath /
 // @schemas http
 // @securityDefinitions.apikey BearerAuth
@@ -37,7 +36,10 @@ func main() {
 
 	db, err := appDatabase.DB.DB()
 	if err != nil {
-		db.Close()
+		errc := db.Close()
+		if errc != nil {
+			panic("cannot connect database and close the connection")
+		}
 		panic("cannot connect database")
 	}
 	defer db.Close()

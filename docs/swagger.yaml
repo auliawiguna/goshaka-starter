@@ -136,7 +136,6 @@ definitions:
     - password_confirmation
     - username
     type: object
-host: 127.0.0.1:3000
 info:
   contact:
     email: wigunaahmadaulia@gmail.com
@@ -390,6 +389,42 @@ paths:
       summary: Validate registration
       tags:
       - Auth
+  /api/v1/files/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a file to a specified AWS S3 bucket
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: A string value (optional)
+        in: formData
+        name: string
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            type: string
+        "400":
+          description: Error message
+          schema:
+            type: string
+        "500":
+          description: Error message
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Upload a file to AWS S3
+      tags:
+      - File Upload
   /api/v1/notes:
     get:
       consumes:
