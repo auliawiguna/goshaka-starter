@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"fmt"
 	"goshaka/app/structs"
 	"goshaka/helpers"
 
@@ -11,7 +12,10 @@ import (
 func LoginValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.Login)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 
@@ -32,7 +36,10 @@ func LoginValidator(c *fiber.Ctx) error {
 func RequestResetPasswordValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.RequestResetPassword)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 
@@ -53,7 +60,10 @@ func RequestResetPasswordValidator(c *fiber.Ctx) error {
 func ResetPasswordValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.ResetPassword)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 
@@ -74,7 +84,10 @@ func ResetPasswordValidator(c *fiber.Ctx) error {
 func GoogleOneTap(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.GoogleOneTap)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 

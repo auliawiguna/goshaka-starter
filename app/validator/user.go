@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"fmt"
 	"goshaka/app/structs"
 	"goshaka/helpers"
 
@@ -15,7 +16,10 @@ import (
 func CreateUserValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.UserCreate)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 
@@ -40,7 +44,10 @@ func CreateUserValidator(c *fiber.Ctx) error {
 func RegistrationValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.RegistrationToken)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 
@@ -65,7 +72,10 @@ func RegistrationValidator(c *fiber.Ctx) error {
 func ResendTokenValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.ResendToken)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 
@@ -90,7 +100,10 @@ func ResendTokenValidator(c *fiber.Ctx) error {
 func ProfileUpdateValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.ProfileUpdate)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 
@@ -115,7 +128,10 @@ func ProfileUpdateValidator(c *fiber.Ctx) error {
 func EmailUpdateValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.EmailUpdate)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 

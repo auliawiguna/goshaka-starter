@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"fmt"
 	"goshaka/app/structs"
 	"goshaka/helpers"
 
@@ -11,7 +12,10 @@ import (
 func CreateNoteValidator(c *fiber.Ctx) error {
 	var errors []*structs.IError
 	body := new(structs.NoteCreate)
-	c.BodyParser(&body)
+	errb := c.BodyParser(&body)
+	if errb != nil {
+		return fmt.Errorf("%s", "error parsing data")
+	}
 
 	err := Validator.Struct(body)
 

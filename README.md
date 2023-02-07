@@ -40,6 +40,9 @@
 ![image](https://user-images.githubusercontent.com/26473549/215829825-b6964b0f-ff95-4b4f-8ba8-e934758fbaa0.png)
 ![image](https://user-images.githubusercontent.com/26473549/213926419-3d2d4b53-3060-48e6-9c26-ebb86c0466b2.png)
 
+## Install Gosec
+- Run `go install github.com/securego/gosec/v2/cmd/gosec@latest`
+
 ## References
 - [https://dev.to/percoguru/getting-started-with-apis-in-golang-feat-fiber-and-gorm-2n34](https://dev.to/percoguru/getting-started-with-apis-in-golang-feat-fiber-and-gorm-2n34)
 - [Email template](https://codepen.io/mightyteja/pen/xxxjXqJ)

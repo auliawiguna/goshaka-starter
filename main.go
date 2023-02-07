@@ -31,7 +31,11 @@ func main() {
 
 	// Database
 	appDatabase.Connect()
-	db, _ := appDatabase.DB.DB()
+	db, err := appDatabase.DB.DB()
+	if err != nil {
+		db.Close()
+		panic("cannot connect database")
+	}
 	defer db.Close()
 
 	// Apply default middleware
