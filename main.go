@@ -30,7 +30,11 @@ func main() {
 	app := fiber.New(config)
 
 	// Database
-	appDatabase.Connect()
+	errConn := appDatabase.Connect()
+	if errConn != nil {
+		panic("cannot connect database")
+	}
+
 	db, err := appDatabase.DB.DB()
 	if err != nil {
 		db.Close()

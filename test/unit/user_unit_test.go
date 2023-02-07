@@ -30,8 +30,7 @@ func TestGetUserByEmail(t *testing.T) {
 // Test code can get user from database
 func TestGetUserById(t *testing.T) {
 
-	var user models.User
-	user = repositories_v1.FindById(1)
+	var user models.User = repositories_v1.FindById(1)
 
 	assert.Equal(t, user.Email, "aulia@goshaka.id", "Email is found")
 }

@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	model "goshaka/app/models"
 	appConfig "goshaka/configs"
 	appHelper "goshaka/helpers"
@@ -35,7 +36,9 @@ func Connect() error {
 		panic(err)
 	}
 
-	DB.AutoMigrate(&model.Note{})
+	if err = DB.AutoMigrate(&model.Note{}); err != nil {
+		fmt.Println("cannot migrate table notes")
+	}
 	if err = DB.AutoMigrate(&model.User{}); err == nil && DB.Migrator().HasTable(&model.User{}) {
 		if err := DB.First(&model.User{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			DB.Create(&model.User{
@@ -121,8 +124,12 @@ func Connect() error {
 			}
 		}
 	}
-	DB.AutoMigrate(&model.UserToken{})
-	DB.AutoMigrate(&model.ChangeEmail{})
+	if err = DB.AutoMigrate(&model.UserToken{}); err != nil {
+		fmt.Println("cannot migrate table user_tokens")
+	}
+	if err = DB.AutoMigrate(&model.ChangeEmail{}); err != nil {
+		fmt.Println("cannot migrate table change_emails")
+	}
 
 	return nil
 }

@@ -26,7 +26,6 @@ func HttpRequestForTest(app *fiber.App, method, url string, reqBody, reqString a
 		req = httptest.NewRequest(method, url, bytes.NewBuffer(jsonValue))
 		req.Header.Add("Content-Type", "application/json")
 	} else {
-		bodyJson, err = json.Marshal(reqBody)
 		req = httptest.NewRequest(method, url, nil)
 	}
 	resp, err := app.Test(req, 1000)

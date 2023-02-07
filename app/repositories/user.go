@@ -152,7 +152,10 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 			ExpiredAt: time.Now().Add(time.Minute * 3), // 3minutes
 		})
 
-		helpers.SendMail(email, "Request Reset Password", "request_reset_password", emailData)
+		errS := helpers.SendMail(email, "Request Reset Password", "request_reset_password", emailData)
+		if errS != nil {
+			fmt.Println("error send email request_reset_password")
+		}
 	}
 
 	return "success", nil
@@ -311,7 +314,10 @@ func ResendNewRegistrationToken(c *fiber.Ctx) error {
 		ExpiredAt: time.Now().Add(time.Hour * 72), // 3days
 	})
 
-	helpers.SendMail(email, "Complete your registration", "registration", emailData)
+	errS := helpers.SendMail(email, "Complete your registration", "registration", emailData)
+	if errS != nil {
+		fmt.Println("error send email registration")
+	}
 
 	return nil
 }
@@ -488,7 +494,10 @@ func Register(c *fiber.Ctx) (models.User, error) {
 		ExpiredAt: time.Now().Add(time.Hour * 72), // 3days
 	})
 
-	helpers.SendMail(email, "Complete your registration", "registration", emailData)
+	errS := helpers.SendMail(email, "Complete your registration", "registration", emailData)
+	if errS != nil {
+		fmt.Println("error send email registration")
+	}
 
 	// Set Role
 	_SetRole(newUser.ID, 1)
@@ -687,7 +696,10 @@ func UpdateProfile(c *fiber.Ctx, id string) (models.User, error) {
 			AppUrl:       appConfig.GetEnv("APP_URL"),
 		}
 
-		helpers.SendMail(email, "Your account has been updated", "updated_account", emailData)
+		errS := helpers.SendMail(email, "Your account has been updated", "updated_account", emailData)
+		if errS != nil {
+			fmt.Println("error send email updated_account")
+		}
 	}
 
 	var mustVerifyChangeEmail bool = false
@@ -721,7 +733,10 @@ func UpdateProfile(c *fiber.Ctx, id string) (models.User, error) {
 			OldEmail:  user.Email,
 			NewEmail:  email,
 		})
-		helpers.SendMail(user.Email, "Verify your email change", "new_email_verification", verifyEmailData)
+		errS := helpers.SendMail(user.Email, "Verify your email change", "new_email_verification", verifyEmailData)
+		if errS != nil {
+			fmt.Println("error send email new_email_verification")
+		}
 	}
 
 	var dataToUpdate = &models.User{
@@ -794,8 +809,14 @@ func UpdateEmailAddress(c *fiber.Ctx, id string) (models.User, error) {
 		FrontendUrl: appConfig.GetEnv("FRONTEND_URL"),
 		AppUrl:      appConfig.GetEnv("APP_URL"),
 	}
-	helpers.SendMail(token.NewEmail, "Your email address has been updated", "updated_email_address", emailData)
-	helpers.SendMail(token.OldEmail, "Your email address has been updated", "updated_email_address", emailData)
+	errS1 := helpers.SendMail(token.NewEmail, "Your email address has been updated", "updated_email_address", emailData)
+	if errS1 != nil {
+		fmt.Println("error send email updated_email_address")
+	}
+	errS2 := helpers.SendMail(token.OldEmail, "Your email address has been updated", "updated_email_address", emailData)
+	if errS2 != nil {
+		fmt.Println("error send email updated_email_address")
+	}
 
 	db.Preload("RoleUser.Role").Find(&user, "id = ?", user.ID)
 

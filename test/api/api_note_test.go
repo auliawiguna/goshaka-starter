@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var errConnectDbOnNote = database.Connect()
+var _ = database.Connect()
 
 // Test code can get record from database
 func TestCanGetNoteIndex(t *testing.T) {

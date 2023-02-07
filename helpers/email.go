@@ -36,7 +36,10 @@ func SendMail(recipient, subject, emailType string, data interface{}) error {
 	mailer.SetBody("text/html", b.String())
 
 	go func() {
-		dialer.DialAndSend(mailer)
+		errd := dialer.DialAndSend((mailer))
+		if errd != nil {
+			fmt.Println("error goroutine dialer")
+		}
 	}()
 
 	return nil
