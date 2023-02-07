@@ -17,7 +17,7 @@ func DefaultMiddleware(a *fiber.App) {
 		}),
 		recover.New(),
 		func(c *fiber.Ctx) error {
-			//Custom middleware here
+			// Custom middleware here
 			return c.Next()
 		},
 	)

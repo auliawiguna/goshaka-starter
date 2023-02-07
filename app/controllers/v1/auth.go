@@ -61,7 +61,7 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	var mutexKey string = "register" + userCreateStructure.Email
-	//Use mutex
+	// Use mutex
 	helpers.LockThread(mutexKey)
 	defer helpers.UnlockThread(mutexKey)
 
@@ -133,7 +133,7 @@ func RequestResetPassword(c *fiber.Ctx) error {
 		return helpers.UnprocessableResponse(c, err, err.Error())
 	}
 
-	//Throttle, 1 requests per email per 15 minutes
+	// Throttle, 1 requests per email per 15 minutes
 	var rateLimit bool = helpers.RateLimit("requestResetPass"+requestResetPasswordStructure.Email, 1, 60*15)
 	if !rateLimit {
 		return helpers.TooManyRequestResponse(c)
@@ -206,8 +206,8 @@ func GoogleOneTap(c *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Router /api/v1/auth/my-profile [get]
 func MyProfile(c *fiber.Ctx) error {
-	userId := c.Locals("user_id")
-	user := repositories_v1.UserShow(fmt.Sprintf("%f", userId))
+	uid := c.Locals("user_id")
+	user := repositories_v1.UserShow(fmt.Sprintf("%f", uid))
 
 	if user.ID == 0 {
 		return helpers.NotFoundResponse(c, user, "not found")
@@ -227,8 +227,8 @@ func MyProfile(c *fiber.Ctx) error {
 // @Param	usersRequest	body	structs.ProfileUpdate	true	"email"
 // @Router /api/v1/auth/my-profile [put]
 func UpdateProfile(c *fiber.Ctx) error {
-	userId := c.Locals("user_id")
-	user, err := repositories_v1.UpdateProfile(c, fmt.Sprintf("%f", userId))
+	uid := c.Locals("user_id")
+	user, err := repositories_v1.UpdateProfile(c, fmt.Sprintf("%f", uid))
 
 	if err != nil {
 		return helpers.UnprocessableResponse(c, user, err.Error())
@@ -248,14 +248,14 @@ func UpdateProfile(c *fiber.Ctx) error {
 // @Param	usersRequest	body	structs.EmailUpdate	true	"email"
 // @Router /api/v1/auth/validate-new-email [post]
 func UpdateEmail(c *fiber.Ctx) error {
-	userId := c.Locals("user_id")
+	uid := c.Locals("user_id")
 
-	var mutexKey string = "updateEmail" + fmt.Sprintf("%f", userId)
-	//Use mutex
+	var mutexKey string = "updateEmail" + fmt.Sprintf("%f", uid)
+	// Use mutex
 	helpers.LockThread(mutexKey)
 	defer helpers.UnlockThread(mutexKey)
 
-	user, err := repositories_v1.UpdateEmailAddress(c, fmt.Sprintf("%f", userId))
+	user, err := repositories_v1.UpdateEmailAddress(c, fmt.Sprintf("%f", uid))
 
 	if err != nil {
 		return helpers.UnprocessableResponse(c, user, err.Error())

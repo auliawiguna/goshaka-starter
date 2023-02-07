@@ -24,7 +24,7 @@ func RoleIndex(c *fiber.Ctx) error {
 	pagination.Limit, _ = strconv.Atoi(c.Query("limit"))
 	pagination.Page, _ = strconv.Atoi(c.Query("page"))
 	pagination.Sort = c.Query("sort")
-	roles, _ := repositories_v1.RoleShowAll(pagination)
+	roles := repositories_v1.RoleShowAll(pagination)
 
 	return helpers.SuccessResponse(c, roles, "success")
 }

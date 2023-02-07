@@ -15,7 +15,7 @@ import (
 //	param	sec int
 //	receiver c *fiber.Ctx
 //	return error
-func ThrottleByKey(key string, max int, sec int) func(c *fiber.Ctx) error {
+func ThrottleByKey(key string, max, sec int) func(c *fiber.Ctx) error {
 	return limiter.New(limiter.Config{
 		// Next: func(c *fiber.Ctx) bool {
 		// return c.IP() == "127.0.0.1"
@@ -38,7 +38,7 @@ func ThrottleByKey(key string, max int, sec int) func(c *fiber.Ctx) error {
 //	param	sec int
 //	receiver c *fiber.Ctx
 //	return error
-func ThrottleByKeyAndIP(key string, max int, sec int) func(c *fiber.Ctx) error {
+func ThrottleByKeyAndIP(key string, max, sec int) func(c *fiber.Ctx) error {
 	return limiter.New(limiter.Config{
 		// Next: func(c *fiber.Ctx) bool {
 		// return c.IP() == "127.0.0.1"
@@ -61,7 +61,7 @@ func ThrottleByKeyAndIP(key string, max int, sec int) func(c *fiber.Ctx) error {
 //	param	sec int
 //	receiver c *fiber.Ctx
 //	return error
-func ThrottleByIp(max int, sec int) func(c *fiber.Ctx) error {
+func ThrottleByIp(max, sec int) func(c *fiber.Ctx) error {
 	return limiter.New(limiter.Config{
 		// Next: func(c *fiber.Ctx) bool {
 		// return c.IP() == "127.0.0.1"

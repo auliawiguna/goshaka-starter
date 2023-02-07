@@ -29,7 +29,7 @@ var (
 //	param maxAttempt int
 //	param maxTimeInSeconds int
 //	return bool
-func RateLimit(key string, maxAttempt int, maxTimeInSeconds int) bool {
+func RateLimit(key string, maxAttempt, maxTimeInSeconds int) bool {
 	Mutex.Lock()
 	defer Mutex.Unlock()
 
@@ -54,7 +54,7 @@ func RateLimit(key string, maxAttempt int, maxTimeInSeconds int) bool {
 //	param	hashed	string
 //	param	plain	string
 //	return	bool
-func CompareHash(hashed string, plain string) bool {
+func CompareHash(hashed, plain string) bool {
 	errHash := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(plain))
 	return errHash == nil
 }

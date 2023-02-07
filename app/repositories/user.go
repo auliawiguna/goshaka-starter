@@ -47,7 +47,7 @@ func LoginUsingGooleOneTap(c *fiber.Ctx) (models.User, string, error) {
 	tokenInfo, err := helpers.VerifyIdToken(c.Context(), idToken)
 
 	if err != nil {
-		return user, "", fmt.Errorf(err.Error())
+		return user, "", fmt.Errorf("%s", err.Error())
 	}
 
 	var email string = tokenInfo.Email
@@ -55,13 +55,13 @@ func LoginUsingGooleOneTap(c *fiber.Ctx) (models.User, string, error) {
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
 
 	if user.ID == 0 {
-		//Remove all reset password token
+		// Remove all reset password token
 		db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 
 		return user, "", fmt.Errorf("credential cannot be found")
 	}
 
-	//Remove all reset password token
+	// Remove all reset password token
 	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 
 	return GenerateJwt(user)
@@ -95,7 +95,7 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 		return user, "", fmt.Errorf("credential cannot be found")
 	}
 
-	//Remove all reset password token
+	// Remove all reset password token
 	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 
 	return GenerateJwt(user)
@@ -122,7 +122,7 @@ func RequestResetPassword(c *fiber.Ctx) (string, error) {
 
 	db := database.DB
 
-	//Check the existence first
+	// Check the existence first
 	user, isExists = FindByEmail(email)
 	if isExists {
 		token := helpers.RandomNumber(6)
@@ -192,14 +192,14 @@ func ResetPassword(c *fiber.Ctx) (string, error) {
 		return "failed", fmt.Errorf("token not found")
 	}
 
-	//Check the existence first
+	// Check the existence first
 	user = FindById(existingToken.UserId)
 	if user.ID != 0 {
-		//Update user
+		// Update user
 		db.Model(&user).Where("id = ?", user.ID).UpdateColumns(&models.User{
 			Password: password,
 		})
-		//Remove all reset password token
+		// Remove all reset password token
 		db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 	}
 
@@ -238,26 +238,26 @@ func ValidateRegistration(c *fiber.Ctx) (models.User, string, error) {
 		return user, "", fmt.Errorf("credential cannot be found")
 	}
 
-	//Find the token
+	// Find the token
 	var token models.UserToken
 	checkToken := db.Where("user_id = ?", user.ID).Where("type = ?", "registration").Where("expired_at > ?", time.Now()).First(&token)
 	if checkToken.RowsAffected == 0 {
 		return user, "", fmt.Errorf("token is not found")
 	}
 
-	//Verify token
+	// Verify token
 	errToken := helpers.CompareHash(token.Token, tokenPayload)
 	if !errToken {
 		return user, "", fmt.Errorf("credential cannot be found")
 	}
 
-	//Delete token
+	// Delete token
 	db.Unscoped().Delete(&token)
 
-	//Validate user
+	// Validate user
 	db.Model(&user).Update("validated_at", time.Now())
 
-	//Generate token
+	// Generate token
 	return GenerateJwt(user)
 }
 
@@ -288,7 +288,7 @@ func ResendNewRegistrationToken(c *fiber.Ctx) error {
 		return fmt.Errorf("user not found")
 	}
 
-	//Delete the token first
+	// Delete the token first
 	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "registration").Delete(&models.UserToken{})
 
 	token := helpers.RandomNumber(6)
@@ -345,7 +345,7 @@ func GenerateJwt(user models.User) (models.User, string, error) {
 //	param	email string
 //	param	username string
 //	return	models.User, bool
-func FindByEmailOrUsername(email string, username string) (models.User, bool) {
+func FindByEmailOrUsername(email, username string) (models.User, bool) {
 	db := database.DB
 
 	var existingUser models.User
@@ -389,39 +389,39 @@ func FindById(id uint) models.User {
 
 // To delete roles by user ID
 //
-//	params	userId	uint
+//	params	uid	uint
 //
 // return void
-func _DeleteRolesByUser(userId uint) {
+func _DeleteRolesByUser(uid uint) {
 	db := database.DB
-	db.Unscoped().Delete(&models.RoleUser{}, "user_id = ?", userId)
+	db.Unscoped().Delete(&models.RoleUser{}, "user_id = ?", uid)
 }
 
 // To delete all roles by user ID and repopulate a role by roleId
 //
-//	params	userId	uint
+//	params	uid	uint
 //	params	roleId	uint
 //
 // return void
-func _ResetRole(userId uint, roleId uint) {
+func _ResetRole(uid, roleId uint) {
 	db := database.DB
-	_DeleteRolesByUser(userId)
+	_DeleteRolesByUser(uid)
 	db.Create(&models.RoleUser{
-		UserId: userId,
+		UserId: uid,
 		RoleId: roleId,
 	})
 }
 
 // To set a role by user ID
 //
-//	params	userId	uint
+//	params	uid	uint
 //	params	roleId	uint
 //
 // return void
-func _SetRole(userId uint, roleId uint) {
+func _SetRole(uid, roleId uint) {
 	db := database.DB
 	db.Create(&models.RoleUser{
-		UserId: userId,
+		UserId: uid,
 		RoleId: roleId,
 	})
 }
@@ -452,13 +452,13 @@ func Register(c *fiber.Ctx) (models.User, error) {
 
 	db := database.DB
 
-	//Check the existence first
+	// Check the existence first
 	_, isExists := FindByEmailOrUsername(email, username)
 	if isExists {
 		return user, fmt.Errorf("registration is failed")
 	}
 
-	//Set User
+	// Set User
 	newUser := models.User{
 		FirstName: first_name,
 		LastName:  last_name,
@@ -490,7 +490,7 @@ func Register(c *fiber.Ctx) (models.User, error) {
 
 	helpers.SendMail(email, "Complete your registration", "registration", emailData)
 
-	//Set Role
+	// Set Role
 	_SetRole(newUser.ID, 1)
 
 	db.Preload("RoleUser.Role").Find(&user, "id = ?", newUser.ID)
@@ -502,15 +502,14 @@ func Register(c *fiber.Ctx) (models.User, error) {
 //
 //	receiver pagination helpers.Pagination
 //	return *helpers.Pagination, bool
-func UserShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
+func UserShowAll(pagination helpers.Pagination) *helpers.Pagination {
 	db := database.DB
 	var users []*models.User
-	var error bool = false
 
 	db.Scopes(scopes.Paginate(users, &pagination, db)).Preload("RoleUser.Role").Find(&users)
 	pagination.Rows = users
 
-	return &pagination, error
+	return &pagination
 }
 
 // Create a users
@@ -552,7 +551,7 @@ func UserCreate(c *fiber.Ctx) (models.User, error) {
 	}
 	db.Create(&newUser)
 
-	//Set Role
+	// Set Role
 	_SetRole(newUser.ID, uint(role_id))
 
 	db.Preload("RoleUser.Role").Find(&user, "id = ?", newUser.ID)
@@ -604,7 +603,7 @@ func UserUpdate(c *fiber.Ctx, id string) (models.User, error) {
 
 	db.Model(&user).Where("id = ?", id).UpdateColumns(dataToUpdate)
 
-	//Set Role
+	// Set Role
 	_ResetRole(user.ID, uint(role_id))
 
 	db.Preload("RoleUser.Role").Find(&user, "id = ?", user.ID)
@@ -632,7 +631,7 @@ func UserDestroy(c *fiber.Ctx, id string) (models.User, error) {
 		return user, fmt.Errorf("you are not allowed to delete your own account")
 	}
 
-	//To soft delete, just remove .Unscoped()
+	// To soft delete, just remove .Unscoped()
 	_DeleteRolesByUser(user.ID)
 	err := db.Unscoped().Delete(&user).Error
 

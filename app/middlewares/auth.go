@@ -42,12 +42,12 @@ func ValidateJWT(c *fiber.Ctx) error {
 
 func RoleAuth(roles []string) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		userId := c.Locals("user_id")
+		uid := c.Locals("user_id")
 
 		db := database.DB
 		var roleUser []*models.RoleUser
 
-		db.Find(&roleUser, "user_id = ?", userId)
+		db.Find(&roleUser, "user_id = ?", uid)
 
 		var rolesIds []uint
 		for _, role := range roleUser {
@@ -67,13 +67,13 @@ func RoleAuth(roles []string) func(c *fiber.Ctx) error {
 
 func PermissionAuth(permissions []string) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		userId := c.Locals("user_id")
+		uid := c.Locals("user_id")
 
 		db := database.DB
 		var roleUser []*models.RoleUser
 		var roles []uint
 
-		db.Find(&roleUser, "user_id = ?", userId)
+		db.Find(&roleUser, "user_id = ?", uid)
 		for _, role := range roleUser {
 			roles = append(roles, role.RoleId)
 		}

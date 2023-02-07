@@ -10,15 +10,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func PermissionShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
+func PermissionShowAll(pagination helpers.Pagination) *helpers.Pagination {
 	db := database.DB
 	var permissions []*models.Permission
-	var error bool = false
 
 	db.Scopes(scopes.Paginate(permissions, &pagination, db)).Find(&permissions)
 	pagination.Rows = permissions
 
-	return &pagination, error
+	return &pagination
 }
 
 func PermissionShow(id string) models.Permission {
@@ -76,7 +75,7 @@ func PermissionDestroy(c *fiber.Ctx, id string) (models.Permission, error) {
 		return permission, fmt.Errorf("not found")
 	}
 
-	//To soft delete, just remove .Unscoped()
+	// To soft delete, just remove .Unscoped()
 	err := db.Unscoped().Delete(&permission).Error
 
 	return permission, err

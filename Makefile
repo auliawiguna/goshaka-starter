@@ -4,6 +4,15 @@ build:
 swagger:
 	swag init --parseDependency --parseDepth 4 -g main.go --output docs/
 
+critic:
+	gocritic check -enableAll ./...
+
+security:
+	gosec ./...
+
+lint:
+	golangci-lint run ./...
+
 run: build
 	./server
 

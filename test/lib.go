@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetJsonTestRequestResponse(app *fiber.App, method string, url string, reqBody any, reqString any) (code int, respBody map[string]any, err error) {
+func GetJsonTestRequestResponse(app *fiber.App, method, url string, reqBody, reqString any) (code int, respBody map[string]any, err error) {
 	bodyJson := []byte("")
 	var req *http.Request
 	if reqBody != nil {

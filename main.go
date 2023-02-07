@@ -29,20 +29,20 @@ func main() {
 	// Define a new Fiber app with config.
 	app := fiber.New(config)
 
-	//Database
+	// Database
 	appDatabase.Connect()
 	db, _ := appDatabase.DB.DB()
 	defer db.Close()
 
-	//Apply default middleware
+	// Apply default middleware
 	appMiddleware.DefaultMiddleware(app)
 
-	//Router
+	// Router
 	apiRoutes.MainRoutes(app)
 	apiRoutes.ApiRoutes(app)
 	apiRoutes.StaticFile(app)
 
-	//Run cronjob
+	// Run cronjob
 	jobs.RunCron()
 
 	if appConfig.GetEnv("ENV") == "dev" {

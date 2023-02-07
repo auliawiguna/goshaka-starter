@@ -24,11 +24,8 @@ func UserIndex(c *fiber.Ctx) error {
 	pagination.Limit, _ = strconv.Atoi(c.Query("limit"))
 	pagination.Page, _ = strconv.Atoi(c.Query("page"))
 	pagination.Sort = c.Query("sort")
-	users, err := repositories_v1.UserShowAll(pagination)
+	users := repositories_v1.UserShowAll(pagination)
 
-	if err {
-		return helpers.UnprocessableResponse(c, users, "error")
-	}
 	return helpers.SuccessResponse(c, users, "success")
 }
 

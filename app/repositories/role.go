@@ -10,15 +10,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RoleShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
+func RoleShowAll(pagination helpers.Pagination) *helpers.Pagination {
 	db := database.DB
 	var roles []*models.Role
-	var error bool = false
 
 	db.Scopes(scopes.Paginate(roles, &pagination, db)).Find(&roles)
 	pagination.Rows = roles
 
-	return &pagination, error
+	return &pagination
 }
 
 func RoleShow(id string) models.Role {
@@ -76,7 +75,7 @@ func RoleDestroy(c *fiber.Ctx, id string) (models.Role, error) {
 		return role, fmt.Errorf("not found")
 	}
 
-	//To soft delete, just remove .Unscoped()
+	// To soft delete, just remove .Unscoped()
 	err := db.Unscoped().Delete(&role).Error
 
 	return role, err

@@ -24,7 +24,7 @@ func PermissionIndex(c *fiber.Ctx) error {
 	pagination.Limit, _ = strconv.Atoi(c.Query("limit"))
 	pagination.Page, _ = strconv.Atoi(c.Query("page"))
 	pagination.Sort = c.Query("sort")
-	permissions, _ := repositories_v1.PermissionShowAll(pagination)
+	permissions := repositories_v1.PermissionShowAll(pagination)
 
 	return helpers.SuccessResponse(c, permissions, "success")
 }

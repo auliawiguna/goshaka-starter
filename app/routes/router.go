@@ -8,7 +8,7 @@ import (
 )
 
 func StaticFile(app *fiber.App) {
-	//Serve local path
+	// Serve local path
 	app.Static("/images", "./public/images", fiber.Static{
 		Compress:  true,
 		ByteRange: true,
@@ -29,7 +29,7 @@ func MainRoutes(app *fiber.App) {
 func ApiRoutes(app *fiber.App) {
 	apiV1 := app.Group("/api/v1", logger.New())
 
-	//Sample of protected route
+	// Sample of protected route
 	routeV1.IndexProtectedRoute(apiV1)
 
 	routeV1.IndexRoute(apiV1)

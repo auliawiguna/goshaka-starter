@@ -10,15 +10,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func NoteShowAll(pagination helpers.Pagination) (*helpers.Pagination, bool) {
+func NoteShowAll(pagination helpers.Pagination) *helpers.Pagination {
 	db := database.DB
 	var notes []*models.Note
-	var error bool = false
 
 	db.Scopes(scopes.Paginate(notes, &pagination, db)).Find(&notes)
 	pagination.Rows = notes
 
-	return &pagination, error
+	return &pagination
 }
 
 func NoteShow(id string) models.Note {
@@ -76,7 +75,7 @@ func NoteDestroy(c *fiber.Ctx, id string) (models.Note, error) {
 		return note, fmt.Errorf("not found")
 	}
 
-	//To soft delete, just remove .Unscoped()
+	// To soft delete, just remove .Unscoped()
 	err := db.Unscoped().Delete(&note).Error
 
 	return note, err
