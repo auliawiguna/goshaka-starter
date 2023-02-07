@@ -64,7 +64,7 @@ func LoginUsingGooleOneTap(c *fiber.Ctx) (models.User, string, error) {
 	// Remove all reset password token
 	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 
-	return GenerateJwt(user)
+	return GenerateJwt(&user)
 }
 
 // Handle user login
@@ -98,7 +98,7 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	// Remove all reset password token
 	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 
-	return GenerateJwt(user)
+	return GenerateJwt(&user)
 }
 
 // To handle request reset password, back end will generate token, save plain token to database, and then send it to user using goroutine
@@ -258,7 +258,7 @@ func ValidateRegistration(c *fiber.Ctx) (models.User, string, error) {
 	db.Model(&user).Update("validated_at", time.Now())
 
 	// Generate token
-	return GenerateJwt(user)
+	return GenerateJwt(&user)
 }
 
 // To resend a new user's registration token
@@ -320,7 +320,7 @@ func ResendNewRegistrationToken(c *fiber.Ctx) error {
 //
 //	param user models.User
 //	return models.User, string, error
-func GenerateJwt(user models.User) (models.User, string, error) {
+func GenerateJwt(user *models.User) (models.User, string, error) {
 	tokenData := jwt.New(jwt.SigningMethodHS256)
 
 	claims := tokenData.Claims.(jwt.MapClaims)
@@ -334,10 +334,10 @@ func GenerateJwt(user models.User) (models.User, string, error) {
 	tokenString, err := tokenData.SignedString(secret)
 
 	if err != nil {
-		return user, "", fmt.Errorf("error when generate JWT")
+		return *user, "", fmt.Errorf("error when generate JWT")
 	}
 
-	return user, tokenString, nil
+	return *user, tokenString, nil
 }
 
 // Find a user by email address or username
