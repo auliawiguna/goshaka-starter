@@ -15,4 +15,5 @@ func FilesRoute(router fiber.Router) {
 	auth := router.Group("/files")
 
 	auth.Post("/upload", middlewares.ValidateJWT, middlewares.ThrottleByKeyAndIP("upload-file", 60, 60), controllerV1.UploadFile)
+	auth.Post("/userfile", middlewares.ValidateJWT, middlewares.ThrottleByKeyAndIP("avatar", 60, 60), controllerV1.UploadUserFile)
 }

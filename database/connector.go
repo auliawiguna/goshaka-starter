@@ -130,6 +130,9 @@ func Connect() error {
 	if err = DB.AutoMigrate(&model.ChangeEmail{}); err != nil {
 		fmt.Println("cannot migrate table change_emails")
 	}
+	if err = DB.AutoMigrate(&model.File{}); err != nil {
+		fmt.Println("cannot migrate table files")
+	}
 
 	return nil
 }

@@ -18,7 +18,7 @@ import (
 //
 //	param file  *multipart.FileHeader
 //	return any, error
-func UploadFileToS3(file *multipart.FileHeader) (any, error) {
+func UploadFileToS3(file *multipart.FileHeader, path string) (any, error) {
 	// Open the file for use
 	uploadFile, err := file.Open()
 	if err != nil {
@@ -44,15 +44,17 @@ func UploadFileToS3(file *multipart.FileHeader) (any, error) {
 		return false, fmt.Errorf("failed to set session: %w", err)
 	}
 
+	fileKey := path + string(RandomNumber(31)) + "_" + file.Filename
+	contentType := http.DetectContentType(fileBuffer)
 	svc := s3.New(sess)
 	// Upload the file to S3.
 	s3PutObjectOutput, err := svc.PutObject(&s3.PutObjectInput{
 		Bucket:               aws.String(configs.GetEnv("AWS_BUCKET")),
-		Key:                  aws.String(file.Filename),
+		Key:                  aws.String(fileKey),
 		ACL:                  aws.String("private"),
 		Body:                 bytes.NewReader(fileBuffer),
 		ContentLength:        aws.Int64(file.Size),
-		ContentType:          aws.String(http.DetectContentType(fileBuffer)),
+		ContentType:          aws.String(contentType),
 		ContentDisposition:   aws.String("attachment"),
 		ServerSideEncryption: aws.String("AES256"),
 	})
@@ -80,7 +82,7 @@ func UploadFileToS3(file *multipart.FileHeader) (any, error) {
 	// Generate a pre-signed URL for the uploaded file
 	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(configs.GetEnv("AWS_BUCKET")),
-		Key:    aws.String(file.Filename),
+		Key:    aws.String(fileKey),
 	})
 	urlStr, err := req.Presign(15 * time.Minute)
 	if err != nil {
@@ -90,6 +92,9 @@ func UploadFileToS3(file *multipart.FileHeader) (any, error) {
 	// assign presigned url
 	// Add a new attribute to the map
 	resultMap["AWSUrl"] = urlStr
+	resultMap["filename"] = fileKey
+	resultMap["mimetype"] = contentType
+	resultMap["size"] = file.Size
 
 	return resultMap, nil
 }
