@@ -426,6 +426,43 @@ paths:
       tags:
       - File Upload
   /api/v1/files/userfile:
+    get:
+      consumes:
+      - application/json
+      description: Show notes
+      parameters:
+      - default: 10
+        description: Default 10
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Default 10
+        in: query
+        name: page
+        type: integer
+      - description: Sorting
+        enum:
+        - ID asc
+        - ID desc
+        - title asc
+        - title desc
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show notes
+      tags:
+      - File Upload
     post:
       consumes:
       - multipart/form-data
@@ -459,6 +496,53 @@ paths:
       security:
       - BearerAuth: []
       summary: Upload a file to AWS S3
+      tags:
+      - File Upload
+  /api/v1/files/userfile/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Show detail file
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show detail file
+      tags:
+      - File Upload
+    get:
+      consumes:
+      - application/json
+      description: Show detail file
+      parameters:
+      - default: 10
+        description: ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Show detail file
       tags:
       - File Upload
   /api/v1/notes:
