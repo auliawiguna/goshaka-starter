@@ -2,9 +2,10 @@ package helpers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"goshaka/configs"
+
+	"github.com/goccy/go-json"
 
 	"google.golang.org/api/idtoken"
 )

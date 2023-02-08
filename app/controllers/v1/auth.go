@@ -1,12 +1,13 @@
 package controller_v1
 
 import (
-	"encoding/json"
 	"fmt"
 	repositories_v1 "goshaka/app/repositories"
 	"goshaka/app/structs"
 	"goshaka/helpers"
 	"strconv"
+
+	"github.com/goccy/go-json"
 
 	"github.com/gofiber/fiber/v2"
 )

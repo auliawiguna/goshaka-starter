@@ -1,7 +1,6 @@
 package repositories_v1
 
 import (
-	"encoding/json"
 	"fmt"
 	"goshaka/app/models"
 	"goshaka/app/models/scopes"
@@ -10,6 +9,8 @@ import (
 	"goshaka/helpers"
 	"strconv"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	appConfig "goshaka/configs"
 
@@ -83,8 +84,8 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	if err != nil {
 		return user, "", fmt.Errorf("payload error")
 	}
-	email := helpers.SanitiseText(loginStructure.Email)
-	password := helpers.SanitiseText(loginStructure.Password)
+	email := loginStructure.Email
+	password := loginStructure.Password
 
 	db := database.DB
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
@@ -96,7 +97,9 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 	}
 
 	// Remove all reset password token
-	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
+	go func() {
+		db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
+	}()
 
 	return GenerateJwt(&user)
 }
