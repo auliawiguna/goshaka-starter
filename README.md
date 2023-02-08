@@ -67,7 +67,7 @@ For example `middlewares.RoleAuth([]string{"admin"})` , it means in order to acc
 ### Email
 ![image](https://user-images.githubusercontent.com/26473549/215829825-b6964b0f-ff95-4b4f-8ba8-e934758fbaa0.png)
 ### Swagger
-![image](https://user-images.githubusercontent.com/26473549/213926419-3d2d4b53-3060-48e6-9c26-ebb86c0466b2.png)
+![image](https://user-images.githubusercontent.com/26473549/217285038-9daff1f9-e334-4e7d-9a0c-539a04569fbb.png)
 
 ## Install Gosec
 - Run `go install github.com/securego/gosec/v2/cmd/gosec@latest`
