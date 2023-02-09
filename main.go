@@ -44,6 +44,12 @@ func main() {
 	}
 	defer db.Close()
 
+	// Initiate S3 Session
+	erraws := appHelper.StartAwsSession()
+	if erraws != nil {
+		panic("cannot start aws session")
+	}
+
 	// Apply default middleware
 	appMiddleware.DefaultMiddleware(app)
 

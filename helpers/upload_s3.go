@@ -14,6 +14,27 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
+// AWS Session
+var sess *session.Session
+
+// AWS S3 Service
+var svc *s3.S3
+
+func StartAwsSession() error {
+	var err error
+	sess, err = session.NewSession(&aws.Config{
+		Region:      aws.String(configs.GetEnv("AWS_DEFAULT_REGION")),
+		Credentials: credentials.NewStaticCredentials(configs.GetEnv("AWS_ACCESS_KEY_ID"), configs.GetEnv("AWS_SECRET_ACCESS_KEY"), ""),
+	})
+
+	if err != nil {
+		return err
+	}
+	svc = s3.New(sess)
+
+	return nil
+}
+
 // Upload file to AWS S3
 //
 //	param file  *multipart.FileHeader
@@ -33,20 +54,13 @@ func UploadFileToS3(file *multipart.FileHeader, path string) (any, error) {
 		return false, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	// Initialize a session in us-west-2 that the SDK will use to load
-	// credentials from the shared credentials file ~/.aws/credentials.
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(configs.GetEnv("AWS_DEFAULT_REGION")),
-		Credentials: credentials.NewStaticCredentials(configs.GetEnv("AWS_ACCESS_KEY_ID"), configs.GetEnv("AWS_SECRET_ACCESS_KEY"), ""),
-	})
-
 	if err != nil {
 		return false, fmt.Errorf("failed to set session: %w", err)
 	}
 
 	fileKey := path + string(RandomNumber(31)) + "_" + file.Filename
 	contentType := http.DetectContentType(fileBuffer)
-	svc := s3.New(sess)
+
 	// Upload the file to S3.
 	s3PutObjectOutput, err := svc.PutObject(&s3.PutObjectInput{
 		Bucket:               aws.String(configs.GetEnv("AWS_BUCKET")),
@@ -104,15 +118,6 @@ func UploadFileToS3(file *multipart.FileHeader, path string) (any, error) {
 //	params	fileKey string
 //	return	string, error
 func GetPresignAWSS3(fileKey string) (string, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(configs.GetEnv("AWS_DEFAULT_REGION")),
-		Credentials: credentials.NewStaticCredentials(configs.GetEnv("AWS_ACCESS_KEY_ID"), configs.GetEnv("AWS_SECRET_ACCESS_KEY"), ""),
-	})
-	if err != nil {
-		return "", fmt.Errorf("failed to set session: %w", err)
-	}
-
-	svc := s3.New(sess)
 
 	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(configs.GetEnv("AWS_BUCKET")),
@@ -126,15 +131,6 @@ func GetPresignAWSS3(fileKey string) (string, error) {
 //	params	fileKey string
 //	return	string, error
 func DeleteFromAWSS3(fileKey string) (bool, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(configs.GetEnv("AWS_DEFAULT_REGION")),
-		Credentials: credentials.NewStaticCredentials(configs.GetEnv("AWS_ACCESS_KEY_ID"), configs.GetEnv("AWS_SECRET_ACCESS_KEY"), ""),
-	})
-	if err != nil {
-		return false, fmt.Errorf("failed to set session: %w", err)
-	}
-
-	svc := s3.New(sess)
 
 	// Define the parameters for the delete object operation
 	params := &s3.DeleteObjectInput{
@@ -145,7 +141,7 @@ func DeleteFromAWSS3(fileKey string) (bool, error) {
 	// Delete the object
 	_, errD := svc.DeleteObject(params)
 	if errD != nil {
-		return false, fmt.Errorf("failed to delete file: %w", err)
+		return false, fmt.Errorf("failed to delete file: %w", errD)
 	}
 	return true, nil
 }
