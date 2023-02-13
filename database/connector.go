@@ -22,8 +22,9 @@ func Connect() error {
 	switch appConfig.GetEnv("DB_DRIVER") {
 	case "mysql":
 		DB, err = gorm.Open(mysql.Open(dbConnURL), &gorm.Config{
-			SkipDefaultTransaction: true,
-			PrepareStmt:            true,
+			SkipDefaultTransaction:                   true,
+			PrepareStmt:                              true,
+			DisableForeignKeyConstraintWhenMigrating: true,
 		})
 	case "postgres":
 		DB, err = gorm.Open(postgres.Open(dbConnURL), &gorm.Config{
