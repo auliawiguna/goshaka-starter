@@ -3,7 +3,7 @@ services:
   goshaka:
     build: "./docker/go"
     ports:
-      - "8080"
+      - "${GOSHAKA_CONTAINER_HTTP_PORT}"
   nginx:
     build: "./docker/nginx"
     ports:

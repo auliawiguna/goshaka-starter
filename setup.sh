@@ -1,3 +1,4 @@
 #!/bin/sh
 
-docker-compose --env-file .docker-env  up -d 
+docker-compose -f docker-compose.yml --env-file .docker-env down 
+docker-compose -f docker-compose.yml --env-file .docker-env up -d 

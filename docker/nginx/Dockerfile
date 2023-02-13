@@ -11,7 +11,7 @@ RUN apk update \
 
 RUN apk add --no-cache curl
 
-EXPOSE 80 81 443
+EXPOSE 3000 80 81 443
 
 
 
