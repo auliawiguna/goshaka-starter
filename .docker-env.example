@@ -1,0 +1,29 @@
+### DOCKER ARGS ##################################
+WORKSPACE_TIMEZONE=UTC
+
+# NGINX
+NGINX_HOST_HTTP_PORT=81
+NGINX_HOST_HTTPS_PORT=443
+NGINX_FPM_CONTAINER=app
+
+### REDIS #################################################
+
+REDIS_PORT=6381
+
+
+### DATA PATH #################################################
+DATA_PATH_HOST=./data
+
+### live server ip
+DOCKER_HOST_IP=127.0.0.1
+
+### MYSQL #################################################
+
+MYSQL_VERSION=8.0
+MYSQL_DATABASE=goshaka_db
+MYSQL_USER=goshaka_dba
+MYSQL_PASSWORD=ikipasswordlho321
+MYSQL_PORT=3308
+MYSQL_ROOT_PASSWORD=ikipasswordlho321
+
+
