@@ -31,7 +31,7 @@ func main() {
 	// Database
 	errConn := appDatabase.Connect()
 	if errConn != nil {
-		panic("cannot connect database")
+		panic("cannot connect database: " + errConn.Error())
 	}
 
 	db, err := appDatabase.DB.DB()
@@ -40,14 +40,20 @@ func main() {
 		if errc != nil {
 			panic("cannot connect database and close the connection")
 		}
-		panic("cannot connect database")
+		panic("cannot connect database: " + errc.Error())
 	}
 	defer db.Close()
+
+	// Initiate Redis
+	errRds := appDatabase.RedisConnect()
+	if errRds != nil {
+		panic("cannot start redis connection: " + errRds.Error())
+	}
 
 	// Initiate S3 Session
 	erraws := appHelper.StartAwsSession()
 	if erraws != nil {
-		panic("cannot start aws session")
+		panic("cannot start aws session: " + erraws.Error())
 	}
 
 	// Apply default middleware

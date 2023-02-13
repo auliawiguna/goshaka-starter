@@ -3,8 +3,10 @@
 # A production ready Golang Boilerplate API
 
 
-## Setup
+## Setup (without Docker)
 - Copy `.env.example` to `.env`, adjust the values, and copy the `.env` to `test/unit` and `test/api`
+- Make sure that you have go version 1.9, MySQL 8.0, and Redis installed in your system
+- Execute `go mod download && go mod verify`
 - To run API test, execute `make api_test`
 - To run unit test, execute `make unit_test`
 - To run development mode, execute `make watch`
