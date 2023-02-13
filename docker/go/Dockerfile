@@ -1,31 +1,29 @@
-# Use Alpine as the base image
-FROM alpine:3.13
+############################
+# STEP 1 build executable binary
+############################
 
-# Set the environment variable for Go version
-ENV GO_VERSION=1.19.0
+# Digest SHA sha256:a00a03c72ecc1a01e4ca7b7cfb62459063912ff45ccb13011f9fb061e25916eb
+# see https://chemidy.medium.com/create-the-smallest-and-secured-golang-docker-image-based-on-scratch-4752223b7324
+FROM golang@sha256:0991060a1447cf648bab7f6bb60335d1243930e38420bee8fec3db1267b84cfa as builder
+# FROM golang:1.19.5-alpine3.17 AS build
 
-# Install required dependencies and set up Go
-RUN apk add --update \
-    curl \
-    supervisor \
-    nano \
-    git \
-    build-base \
-  && curl -fsSL https://golang.org/dl/go$GO_VERSION.src.tar.gz -o go.tar.gz \
-  && tar -xzf go.tar.gz \
-  && rm go.tar.gz \
-  && cd go/src \
-  && ./make.bash \
-  && cd / \
-  && rm -rf go \
-  && apk del curl \
-  git \
-  build-base
+# Install git + SSL ca certificates.
+# Git is required for fetching the dependencies.
+# Ca-certificates is required to call HTTPS endpoints.
+RUN apk update && apk add --no-cache git ca-certificates && update-ca-certificates
+# Create appuser
+ENV USER=appuser
+ENV UID=10001
+# See https://stackoverflow.com/a/55757473/12429735RUN 
+RUN adduser \    
+    --disabled-password \    
+    --gecos "" \    
+    --home "/nonexistent" \    
+    --shell "/sbin/nologin" \    
+    --no-create-home \    
+    --uid "${UID}" \    
+    "${USER}"
 
-# Set the environment variables for Go
-ENV GOROOT /usr/local/go
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:$GOROOT/bin:$PATH
 
 WORKDIR /go/src/app
 
@@ -37,14 +35,3 @@ RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 # Development Mode
 RUN GOOS=linux make watch
-
-# Production Mode
-# RUN GOOS=linux make build
-# FROM alpine:3.10
-# RUN apk --no-cache add ca-certificates
-# WORKDIR /usr/bin
-# RUN mkdir -p /go/src/bin/goshaka
-# COPY /go/src/server /go/bin/goshaka
-# COPY /go/src/.env /go/bin/goshaka
-# EXPOSE 3000
-# ENTRYPOINT /go/bin/goshaka/server
