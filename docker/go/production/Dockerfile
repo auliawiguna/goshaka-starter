@@ -49,7 +49,7 @@ COPY --from=builder /etc/group /etc/group
 # Copy our static executable.
 COPY --from=builder /go/bin/goshaka /go/bin/goshaka
 
-COPY --from=builder /go/src/goshaka/.env /go/bin/goshaka/.env
+COPY --from=builder /go/src/goshaka/.env /go/bin/.env
 
 # Use an unprivileged user.
 USER appuser:appuser
