@@ -40,6 +40,10 @@ RUN wget https://github.com/cespare/reflex/releases/download/v0.3.1/reflex_linux
     tar -xvzf reflex_linux_amd64.tar.gz && \
     mv reflex_linux_amd64/reflex $GOPATH/bin
 
+RUN wget https://github.com/golangci/golangci-lint/releases/download/v1.51.1/golangci-lint-1.51.1-linux-amd64.tar.gz && \
+    tar -xvzf golangci-lint-1.51.1-linux-amd64.tar.gz && \
+    mv golangci-lint-1.51.1-linux-amd64/golangci-lint $GOPATH/bin
+
 # RUN go mod download && go mod verify
 
 CMD ["make", "watch"]

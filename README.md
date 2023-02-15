@@ -3,7 +3,8 @@
 # A production ready Golang Boilerplate API
 
 
-## Setup without Docker
+## Setup
+### Setup without Docker
 - Copy `.env.example` to `.env`, adjust the values, and copy the `.env` to `test/unit` and `test/api`
 - Make sure that you have go version 1.9, MySQL 8.0, and Redis installed in your system
 - Execute `go mod download && go mod verify`
@@ -13,7 +14,15 @@
 - [Linux] Install `swag` by execute `go install github.com/swaggo/swag/cmd/swag@latest`
 - Generate swagger docs by execute `make swagger`
 
-## Setup using Docker (RECOMMENDED)
+### Setup using Docker (RECOMMENDED)
+- Make sure that you have `docker` and `docker-compose` installed in your system
+- Copy `.env.example` to `.env`, adjust the values, and copy the `.env` to `test/unit` and `test/api`
+- Copy `.docker-env.example` to `.docker-env`, adjust the values to meet your requirements
+- To build for development mode, set ENV in `.docker-env` to `development`, to build for development mode, set ENV in `.docker-env` to `production`
+- Run `docker-compose -f docker-compose.yml --env-file .docker-env up -d`
+
+## Useful Commands
+WIP
 
 ## Features
 - Log in using username and password
