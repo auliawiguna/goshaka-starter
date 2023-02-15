@@ -1,7 +1,9 @@
 version: "3.6"
 services:
   goshaka:
-    build: "./docker/go"
+    build:
+      context: .
+      dockerfile: "./docker/go/${ENV}/Dockerfile"
     ports:
       - "${GOSHAKA_CONTAINER_HTTP_PORT}"
   nginx:
