@@ -7,8 +7,8 @@ services:
       dockerfile: "./docker/go/${ENV}/Dockerfile"
     networks:
       - backend
-      ports:
-      - "${GOSHAKA_CONTAINER_HTTP_PORT}"
+    ports:
+    - "${GOSHAKA_CONTAINER_HTTP_PORT}"
   nginx:
     container_name: goshaka_nginx
     build: "./docker/nginx"
