@@ -1,3 +1,4 @@
 .env
 server
 .docker-env
+_data

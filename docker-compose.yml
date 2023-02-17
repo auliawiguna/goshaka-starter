@@ -7,6 +7,7 @@ services:
       dockerfile: "./docker/go/${ENV}/Dockerfile"
     volumes:
       - .:/go/src/goshaka      
+      - ./logs/supervisor/:/var/log/supervisor
     networks:
       - backend
     ports:
@@ -39,7 +40,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - TZ=${WORKSPACE_TIMEZONE}
     volumes:
-      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
+#      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
       - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     ports:
       - "${MYSQL_PORT}:3306"
@@ -50,7 +51,7 @@ services:
     container_name: goshaka_redis
     build: ./docker/redis
     volumes:
-      - ${DATA_PATH_HOST}/redis:/data
+#      - ${DATA_PATH_HOST}/redis:/data
     ports:
       - "${REDIS_PORT}:6379"
     networks:

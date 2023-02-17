@@ -3,6 +3,9 @@
 docker-compose -f docker-compose.yml --env-file .docker-env down 
 docker-compose -f docker-compose.yml --env-file .docker-env up -d 
 
+# Restart supervisord
+# docker exec -it goshaka_be supervisorctl restart goshaka-worker:
+
 # Remove cache
 # docker builder prune
 

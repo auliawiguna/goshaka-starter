@@ -14,7 +14,7 @@ REDIS_PORT=6381
 
 
 ### DATA PATH #################################################
-DATA_PATH_HOST=./data
+DATA_PATH_HOST=./_data
 
 ### live server ip
 DOCKER_HOST_IP=127.0.0.1

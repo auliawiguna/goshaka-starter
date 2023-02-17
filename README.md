@@ -1,6 +1,7 @@
+
 ![image](https://user-images.githubusercontent.com/26473549/214473471-19e5a263-cf21-440a-9beb-d2cc16eed9fc.png)
 
-# A production ready Golang Boilerplate API
+# A production-ready Golang Boilerplate API
 
 
 ## Setup
@@ -8,18 +9,26 @@
 - Copy `.env.example` to `.env`, adjust the values, and copy the `.env` to `test/unit` and `test/api`
 - Make sure that you have go version 1.9, MySQL 8.0, and Redis installed in your system
 - Execute `go mod download && go mod verify`
-- To run API test, execute `make api_test`
-- To run unit test, execute `make unit_test`
+- To run the API test, execute `make api_test`
+- To run the unit test, execute `make unit_test`
 - To run development mode, execute `make watch`
-- [Linux] Install `swag` by execute `go install github.com/swaggo/swag/cmd/swag@latest`
-- [Linux, mac] Install `reflex` by execute `go install github.com/cespare/reflex@latest`
-- Generate swagger docs by execute `make swagger`
+- [Linux] Install `swag` by executing `go install github.com/swaggo/swag/cmd/swag@latest`
+- [Linux, mac] Install `reflex` by executing `go install github.com/cespare/reflex@latest`
+- Generate swagger docs by executing `make swagger`
 
-### Setup using Docker (RECOMMENDED)
+### Setup using Docker (DEVELOPMENT MODE)
 - Make sure that you have `docker` and `docker-compose` installed in your system
-- Copy `.env.example` to `.env`, adjust the values, and copy the `.env` to `test/unit` and `test/api`
+- Copy `.env.example` to `.env`, adjust the values based on the container's name, and copy the `.env` to `test/unit` and `test/api`
 - Copy `.docker-env.example` to `.docker-env`, adjust the values to meet your requirements
-- To build for development mode, set ENV in `.docker-env` to `development`, to build for development mode, set ENV in `.docker-env` to `production`
+- To build for development mode, set ENV in `.docker-env` to `development`
+- Run `docker-compose -f docker-compose.yml --env-file .docker-env up -d`
+- Run `docker exec -it goshaka_be make watch` to activate the development mode
+
+### Setup using Docker (PRODUCTION MODE)
+- Make sure that you have `docker` and `docker-compose` installed in your system
+- Copy `.env.example` to `.env`, adjust the values based on the container's name, and copy the `.env` to `test/unit` and `test/api`
+- Copy `.docker-env.example` to `.docker-env`, adjust the values to meet your requirements
+- To build for development mode, set ENV in `.docker-env` to `production`
 - Run `docker-compose -f docker-compose.yml --env-file .docker-env up -d`
 
 ## Useful Commands
@@ -30,7 +39,7 @@
 - To lint your code, you can execute `make lint`
 - To build goshaka binary, you can execute `make build`
 ### Using Docker
-- To get in to the goshaka main image, execute `docker exec -it goshaka_be sh`
+- To get into the goshaka main image, execute `docker exec -it goshaka_be sh`
 - To start goshaka in development mode outside the image, you can execute `docker exec -it goshaka_be make watch`
 - To re-generate swagger outside the image, you can execute `docker exec -it goshaka_be make swagger`
 - To check your code style outside the image, you can execute `docker exec -it goshaka_be make critic`
@@ -46,37 +55,37 @@
 - My Profile
 - Change Profile
 - Example of CRUD function
-- Verification on email change
+- Verification of email change
 - Role Permission Based Access Control inspired by [Spatie Laravel Permission Matrix](https://github.com/spatie/laravel-permission)
 - Pagination
 - Cronjob using [gocron](https://github.com/go-co-op/gocron)
-- Upload file to AWS S3
+- Upload the file to AWS S3
 
 ## Middlewares
 ### Using rate limiter
 We have 3 rate limiters here:
-- ThrottleByIp, this rate limiter will limits requests by the user's IP, if you are using Nginx, please make sure that the x-real-ip header is exposed to the back end
-- ThrottleByKeyAndIP, this rate limiter will limit requests by the user's IP and a custom key, for example, if you need to rate limit an endpoint to register, you may use this rate limiter by ThrottleByKeyAndIP("register", 60, 60). It will limits request from an IP with the key "register" to only 60 times each 60 seconds
-- ThrottleByKey, this rate limiter will limit requests by a custom key, for example, if you need to rate limit an endpoint to register, you may use this rate limiter by ThrottleByKey("register", 60, 60). It will limits request from any IP with the key "register" to only 60 times each 60 seconds
-For the real example, you may open `app/routes/api/v1/auth.go`
+- ThrottleByIp, this rate limiter will limit requests by the user's IP, if you are using Nginx, please make sure that the x-real-ip header is exposed to the back end
+- ThrottleByKeyAndIP, this rate limiter will limit requests by the user's IP and a custom key, for example, if you need to rate limit an endpoint to register, you may use this rate limiter by ThrottleByKeyAndIP("register", 60, 60). It will limit requests from an IP with the key "register" to only 60 times each 60 seconds
+- ThrottleByKey, this rate limiter will limit requests by a custom key, for example, if you need to rate limit an endpoint to register, you may use this rate limiter by ThrottleByKey("register", 60, 60). It will limits requests from any IP with the key "register" to only 60 times each 60 seconds
+For the actual example, you may open `app/routes/api/v1/auth.go`
 
 ### Protect a route using JWT
-You can use `PermissionAuth` middleware to protect a URL by the current user's permissions. It means that the users must have particular permission(s) in order to access the protected routes.
+You can use the `PermissionAuth` middleware to protect a URL with the current user's permission. It means that the users must have particular permission(s) to access the protected routes.
 You need to import `goshaka/app/middlewares` and then add the `middlewares.PermissionAuth` middleware as a route handler, 
 you can see the example in `app/routes/api/v1/user.go`.
-For example `middlewares.PermissionAuth([]string{"user-read"})` , it means in order to access a particular route, a user must have permission `user-read`
+For example `middlewares.PermissionAuth([]string{"user-read"})` , means to access a particular route, a user must have permission `user-read`
 
-### Protect a route using user's permission checker 
-You can use `PermissionAuth` middleware to protect a URL by the current user's permissions. It means that the users must have particular permission(s) in order to access the protected routes.
+### Protect a route using the user's permission checker 
+You can use the `PermissionAuth` middleware to protect a URL with the current user's permission. It means that the users must have particular permission(s) to access the protected routes.
 You need to import `goshaka/app/middlewares` and then add the `middlewares.PermissionAuth` middleware as a route handler, 
 you can see the example in `app/routes/api/v1/user.go`.
-For example `middlewares.PermissionAuth([]string{"user-read"})` , it means in order to access particular route, a user must have permission `user-read`
+For example `middlewares.PermissionAuth([]string{"user-read"})` , means to access a particular route, a user must have permission `user-read`
 
-### Protect a route using user's role checker 
-You can use `RoleAuth` middleware to protect a URL from the current user's roles. It means that the users must have a particular role(s) in order to access the protected routes.
+### Protect a route using the user's role checker 
+You can use `RoleAuth` middleware to protect a URL from the current user's roles. It means that the users must have a particular role(s) to access the protected routes.
 You need to import `goshaka/app/middlewares` and then add the `middlewares.RoleAuth` middleware as a route handler, 
 you can see the example in `app/routes/api/v1/user.go`.
-For example `middlewares.RoleAuth([]string{"admin"})` , it means in order to access the particular route, a user must have the role `admin`
+For example `middlewares.RoleAuth([]string{"admin"})` , means to access the particular route, a user must have the role `admin`
 
 ## Capabilities
 - Auto migration
