@@ -46,4 +46,8 @@ RUN wget https://github.com/golangci/golangci-lint/releases/download/v1.51.1/gol
 
 # RUN go mod download && go mod verify
 
+VOLUME /data
+
+EXPOSE 3000
+
 CMD ["make", "watch"]

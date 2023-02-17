@@ -8,3 +8,6 @@ docker-compose -f docker-compose.yml --env-file .docker-env up -d
 
 # To force rebuild
 # docker-compose -f docker-compose.yml --env-file .docker-env up -d --build --force-recreate 
+
+# To rebuild a service
+# docker-compose -f docker-compose.yml --env-file .docker-env up -d --no-deps --build <service>

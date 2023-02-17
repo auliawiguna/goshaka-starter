@@ -54,4 +54,9 @@ COPY --from=builder /go/src/goshaka/.env /go/bin/.env
 # Use an unprivileged user.
 USER appuser:appuser
 # Run the hello binary.
+
+VOLUME /data
+
+EXPOSE 3000
+
 ENTRYPOINT ["/go/bin/goshaka"]
