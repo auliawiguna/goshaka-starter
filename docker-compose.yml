@@ -50,7 +50,7 @@ services:
   redis:
     container_name: goshaka_redis
     build: ./docker/redis
-    volumes:
+#    volumes:
 #      - ${DATA_PATH_HOST}/redis:/data
     ports:
       - "${REDIS_PORT}:6379"
