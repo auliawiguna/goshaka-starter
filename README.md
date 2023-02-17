@@ -22,7 +22,19 @@
 - Run `docker-compose -f docker-compose.yml --env-file .docker-env up -d`
 
 ## Useful Commands
-WIP
+### Without Docker
+- To start goshaka in development mode, you can execute `make watch`
+- To re-generate swagger, you can execute `make swagger`
+- To check your code style, you can execute `make critic`
+- To lint your code, you can execute `make lint`
+- To build goshaka binary, you can execute `make build`
+### Using Docker
+- To get in to the goshaka main image, execute `docker exec -it goshaka_be sh`
+- To start goshaka in development mode outside the image, you can execute `docker exec -it goshaka_be make watch`
+- To re-generate swagger outside the image, you can execute `docker exec -it goshaka_be make swagger`
+- To check your code style outside the image, you can execute `docker exec -it goshaka_be make critic`
+- To lint your code outside the image, you can execute `docker exec -it goshaka_be make lint`
+- To build goshaka binary, you can execute `docker exec -it goshaka_be make build`
 
 ## Features
 - Log in using username and password

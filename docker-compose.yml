@@ -1,12 +1,16 @@
 version: "3.6"
 services:
   goshaka:
+    container_name: goshaka_be
     build:
       context: .
       dockerfile: "./docker/go/${ENV}/Dockerfile"
-    ports:
+    networks:
+      - backend
+      ports:
       - "${GOSHAKA_CONTAINER_HTTP_PORT}"
   nginx:
+    container_name: goshaka_nginx
     build: "./docker/nginx"
     ports:
       - "${NGINX_HOST_HTTP_PORT}:80"
