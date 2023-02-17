@@ -12,6 +12,7 @@
 - To run unit test, execute `make unit_test`
 - To run development mode, execute `make watch`
 - [Linux] Install `swag` by execute `go install github.com/swaggo/swag/cmd/swag@latest`
+- [Linux, mac] Install `reflex` by execute `go install github.com/cespare/reflex@latest`
 - Generate swagger docs by execute `make swagger`
 
 ### Setup using Docker (RECOMMENDED)

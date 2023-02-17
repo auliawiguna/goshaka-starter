@@ -3,6 +3,9 @@
 docker-compose -f docker-compose.yml --env-file .docker-env down 
 docker-compose -f docker-compose.yml --env-file .docker-env up -d 
 
+# Remove cache
+# docker builder prune
+
 # To rebuild
 # docker-compose -f docker-compose.yml --env-file .docker-env up -d --build
 

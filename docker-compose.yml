@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: "./docker/go/${ENV}/Dockerfile"
+    volumes:
+      - .:/go/src/goshaka      
     networks:
       - backend
     ports:
