@@ -1,8 +1,9 @@
 FROM redis:alpine
 
-## For security settings uncomment, make the dir, copy conf, and also start with the conf, to use it
-#RUN mkdir -p /usr/local/etc/redis
-#COPY redis.conf /usr/local/etc/redis/redis.conf
+# For the security reason, it is recommended to use redis.conf, kindly update the password within the redis.conf
+# Create directory /usr/local/etc/redis and copy the redis.conf into that directory
+# RUN mkdir -p /usr/local/etc/redis
+# COPY redis.conf /usr/local/etc/redis/redis.conf
 
 VOLUME /data
 
