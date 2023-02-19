@@ -56,14 +56,11 @@ func LoginUsingGooleOneTap(c *fiber.Ctx) (models.User, string, error) {
 	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
 
 	if user.ID == 0 {
-		// Remove all reset password token
-		db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
-
 		return user, "", fmt.Errorf("credential cannot be found")
 	}
 
 	// Remove all reset password token
-	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
+	removeResetPasswordTokens(fmt.Sprint(user.ID))
 
 	return GenerateJwt(&user)
 }
@@ -98,7 +95,7 @@ func Login(c *fiber.Ctx) (models.User, string, error) {
 
 	// Remove all reset password token
 	go func() {
-		db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
+		removeResetPasswordTokens(fmt.Sprint(user.ID))
 	}()
 
 	return GenerateJwt(&user)
@@ -206,7 +203,7 @@ func ResetPassword(c *fiber.Ctx) (string, error) {
 			Password: password,
 		})
 		// Remove all reset password token
-		db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "reset_password").Delete(&models.UserToken{})
+		removeResetPasswordTokens(fmt.Sprint(user.ID))
 	}
 
 	return "success", nil
@@ -824,4 +821,9 @@ func UpdateEmailAddress(c *fiber.Ctx, id string) (models.User, error) {
 	db.Preload("RoleUser.Role").Find(&user, "id = ?", user.ID)
 
 	return user, nil
+}
+
+func removeResetPasswordTokens(id string) {
+	db := database.DB
+	db.Unscoped().Where("user_id = ?", id).Where("type = ?", "reset_password").Delete(&models.UserToken{})
 }
