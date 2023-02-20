@@ -4,15 +4,8 @@ import (
 	"fmt"
 	"goshaka/app/models"
 	"goshaka/app/models/scopes"
-	"goshaka/configs"
 	"goshaka/database"
 	"goshaka/helpers"
-	"time"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 // Show all files belong to current user
@@ -26,25 +19,9 @@ func FileShowAll(pagination helpers.Pagination, uid string) *helpers.Pagination 
 
 	db.Scopes(scopes.Paginate(files, &pagination, db)).Where("user_id = ?", uid).Find(&files)
 
-	// activate AWS session
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(configs.GetEnv("AWS_DEFAULT_REGION")),
-		Credentials: credentials.NewStaticCredentials(configs.GetEnv("AWS_ACCESS_KEY_ID"), configs.GetEnv("AWS_SECRET_ACCESS_KEY"), ""),
-	})
-	if err != nil {
-		panic("cannot get s3 session")
-	}
-
-	svc := s3.New(sess)
-
 	// loop file
 	for i := range files {
-		req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
-			Bucket: aws.String(configs.GetEnv("AWS_BUCKET")),
-			Key:    aws.String(files[i].Filename),
-		})
-
-		path, _ := req.Presign(15 * time.Minute)
+		path, _ := helpers.GetPresignAWSS3(files[i].Filename)
 
 		files[i].Path = path
 	}
