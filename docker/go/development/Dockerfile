@@ -42,6 +42,11 @@ RUN wget https://github.com/golangci/golangci-lint/releases/download/v1.51.1/gol
     tar -xvzf golangci-lint-1.51.1-linux-amd64.tar.gz && \
     mv golangci-lint-1.51.1-linux-amd64/golangci-lint $GOPATH/bin
 
+RUN wget https://github.com/protocolbuffers/protobuf/releases/download/v22.0/protoc-22.0-linux-x86_64.zip && \
+    tar -xvzf protoc-22.0-linux-x86_64.tar.gz && \
+    mv golangci-lint-1.51.1-linux-amd64/golangci-lint $GOPATH/bin
+    
+
 # RUN go mod download && go mod verify
 
 VOLUME /data
