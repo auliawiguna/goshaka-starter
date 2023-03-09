@@ -7,12 +7,19 @@ import (
 	"goshaka/database"
 	"goshaka/helpers"
 
+	goshakastringhelper "github.com/auliawiguna/goshaka-stringhelper"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
 func ValidateJWT(c *fiber.Ctx) error {
-	tokenString := c.Get("Authorization")
+	authheader := c.Get("Authorization")
+
+	if !goshakastringhelper.Contains(authheader, "Bearer") {
+		return helpers.UnauthorisedResponse(c, nil, "invalid token")
+	}
+
+	tokenString := goshakastringhelper.After(authheader, "Bearer ")
 
 	secret := []byte(appConfig.GetEnv("JWT_KEY"))
 	signingMethod := jwt.SigningMethodHS256
