@@ -1,5 +1,5 @@
 build:
-	go build -o server main.go
+	go build -o server -gcflags=all=-l -ldflags="-w -s" main.go
 
 swagger:
 	$(GOPATH)/bin/swag init --parseDependency --parseDepth 4 -g main.go --output docs/
