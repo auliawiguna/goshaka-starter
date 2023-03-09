@@ -38,6 +38,7 @@ func Login(c *fiber.Ctx) error {
 	res := map[string]interface{}{
 		"user":         user,
 		"access_token": jwt,
+		"type":         "bearer",
 	}
 
 	return helpers.SuccessResponse(c, res, "success")
@@ -93,6 +94,7 @@ func ValidateRegistration(c *fiber.Ctx) error {
 	res := map[string]interface{}{
 		"user":         user,
 		"access_token": jwt,
+		"type":         "bearer",
 	}
 
 	return helpers.SuccessResponse(c, res, "success")
@@ -193,6 +195,7 @@ func GoogleOneTap(c *fiber.Ctx) error {
 	res := map[string]interface{}{
 		"user":         user,
 		"access_token": jwt,
+		"type":         "bearer",
 	}
 
 	return helpers.SuccessResponse(c, res, "success")
