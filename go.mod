@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/arsmn/fiber-swagger/v2 v2.31.1
-	github.com/auliawiguna/goshaka-stringhelper v0.1.2
+	github.com/auliawiguna/goshaka-stringhelper v0.1.3
 	github.com/aws/aws-sdk-go v1.44.195
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-co-op/gocron v1.18.0
