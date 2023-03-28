@@ -43,6 +43,13 @@ func main() {
 		}
 		panic("cannot connect database: " + errc.Error())
 	}
+
+	// Migrate
+	errM := appDatabase.MigrateDatabase()
+	if errM != nil {
+		panic("migration error: " + errM.Error())
+	}
+
 	defer db.Close()
 
 	// Initiate Redis
