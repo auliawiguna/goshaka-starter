@@ -15,6 +15,7 @@
 - [Linux] Install `swag` by executing `go install github.com/swaggo/swag/cmd/swag@latest`
 - [Linux, mac] Install `reflex` by executing `go install github.com/cespare/reflex@latest`
 - Generate swagger docs by executing `make swagger`
+- To access swagger documentation, open `URL:PORT/api/v1/documentation/index.html` in your browser
 
 ### Setup using Docker (DEVELOPMENT MODE)
 - Make sure that you have `docker` and `docker-compose` installed in your system
