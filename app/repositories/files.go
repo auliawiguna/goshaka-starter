@@ -80,7 +80,10 @@ func FileDestroy(id, uid string) (models.File, error) {
 
 	// delete from S3
 	go func() {
-		helpers.DeleteFromAWSS3(file.Filename)
+		_, e := helpers.DeleteFromAWSS3(file.Filename)
+		if e != nil {
+			return
+		}
 	}()
 
 	// To soft delete, just remove .Unscoped()
