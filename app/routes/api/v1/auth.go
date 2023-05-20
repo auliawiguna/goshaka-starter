@@ -22,6 +22,9 @@ func AuthRoute(router fiber.Router) {
 	auth.Post("/register", middlewares.ThrottleByKeyAndIP("register", 60, 60), validator.CreateUserValidator, controllerV1.Register)
 	auth.Post("/validate-registration", validator.RegistrationValidator, controllerV1.ValidateRegistration)
 	auth.Post("/resend-registration-token", middlewares.ThrottleByKeyAndIP("resend-registration-token", 60, 60), validator.ResendTokenValidator, controllerV1.ResendRegistrationToken)
+	// OTP login
+	auth.Post("/otp/request", middlewares.ThrottleByKeyAndIP("otp_request", 60, 60), validator.RequestOtpValidator, controllerV1.SendOtp)
+	auth.Post("/otp/validate", middlewares.ThrottleByKeyAndIP("otp_validate", 60, 60), validator.RequestValidateOtpValidator, controllerV1.ValidateOtp)
 	// Forgot Password
 	auth.Post("/request-reset-password", middlewares.ThrottleByKeyAndIP("request-reset-password", 60, 60), validator.RequestResetPasswordValidator, controllerV1.RequestResetPassword)
 	auth.Post("/reset-password", validator.ResetPasswordValidator, controllerV1.ResetPassword)

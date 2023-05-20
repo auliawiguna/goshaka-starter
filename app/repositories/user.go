@@ -322,6 +322,111 @@ func ResendNewRegistrationToken(c *fiber.Ctx) error {
 	return nil
 }
 
+// To send an OTP to a user
+//
+//	param	c *fiber.Ctx
+//	return	string, error
+func SendOtpToken(c *fiber.Ctx) error {
+
+	var user models.User
+	var emailStruct structs.EmailOnly
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &emailStruct)
+
+	if err != nil {
+		return fmt.Errorf("payload error")
+	}
+	email := helpers.SanitiseText(emailStruct.Email)
+
+	db := database.DB
+	// find user
+	db.Where("email = ?", email).Find(&user)
+
+	if user.ID == 0 {
+		return fmt.Errorf("user not found")
+	}
+
+	// Delete the token first
+	db.Unscoped().Where("user_id = ?", user.ID).Where("type = ?", "otp").Delete(&models.UserToken{})
+
+	token := helpers.RandomNumber(6)
+	hashedToken, _ := helpers.CreateHash(token)
+
+	emailData := struct {
+		FirstName string
+		Token     string
+		AppUrl    string
+	}{
+		FirstName: user.FirstName,
+		Token:     string(token),
+		AppUrl:    appConfig.GetEnv("APP_URL"),
+	}
+
+	db.Create(&models.UserToken{
+		UserId:    user.ID,
+		Type:      "otp",
+		Token:     hashedToken,
+		ExpiredAt: time.Now().Add(time.Minute * 3), // 3 minutes
+	})
+
+	errS := helpers.SendMail(email, "OTP", "otp", emailData)
+	if errS != nil {
+		fmt.Println("error send email otp")
+	}
+
+	return nil
+}
+
+// To validate OTP request
+// user will sends token, password, and email,
+// once password has been updated, system will remove any registration
+// tokens related to current user
+//
+//	param	c *fiber.Ctx
+//	return	string, error
+func ValidateOtpRequest(c *fiber.Ctx) (models.User, string, error) {
+
+	var user models.User
+	var loginStructure structs.EmailAndToken
+
+	body := c.Body()
+
+	err := json.Unmarshal(body, &loginStructure)
+
+	if err != nil {
+		return user, "", fmt.Errorf("payload error")
+	}
+	email := helpers.SanitiseText(loginStructure.Email)
+	tokenPayload := helpers.SanitiseText(loginStructure.Token)
+
+	db := database.DB
+	db.Preload("RoleUser.Role").Find(&user, "email = ?", email)
+
+	// Find the token
+	var token models.UserToken
+	checkToken := db.Where("user_id = ?", user.ID).Where("type = ?", "otp").Where("expired_at > ?", time.Now()).First(&token)
+	if checkToken.RowsAffected == 0 {
+		return user, "", fmt.Errorf("token is not found")
+	}
+
+	// Verify token
+	errToken := helpers.CompareHash(token.Token, tokenPayload)
+	if !errToken {
+		return user, "", fmt.Errorf("credential cannot be found")
+	}
+
+	// Delete token
+	db.Unscoped().Delete(&token)
+
+	// Validate user
+	db.Model(&user).Update("validated_at", time.Now())
+
+	// Generate token
+	return GenerateJwt(&user)
+}
+
 // Generate stateless JWT auth
 //
 //	param user models.User

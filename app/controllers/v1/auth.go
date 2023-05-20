@@ -118,6 +118,48 @@ func ResendRegistrationToken(c *fiber.Ctx) error {
 	return helpers.SuccessResponse(c, err, "success")
 }
 
+// @Summary Send OTP request
+// @Description Send OTP request
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	loginRequest	body	structs.ResendToken	true	"email"
+// @Router /api/v1/auth/resend-registration-token [post]
+func SendOtp(c *fiber.Ctx) error {
+	err := repositories_v1.SendOtpToken(c)
+
+	if err != nil {
+		return helpers.UnprocessableResponse(c, err, err.Error())
+	}
+
+	return helpers.SuccessResponse(c, err, "success")
+}
+
+// @Summary Validate OTP request
+// @Description Validate OTP request
+// @Tags Auth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Param	loginRequest	body	structs.ResendToken	true	"email"
+// @Router /api/v1/auth/resend-registration-token [post]
+func ValidateOtp(c *fiber.Ctx) error {
+	user, jwt, err := repositories_v1.ValidateOtpRequest(c)
+
+	if err != nil {
+		return helpers.UnauthorisedResponse(c, err, err.Error())
+	}
+
+	res := map[string]interface{}{
+		"user":         user,
+		"access_token": jwt,
+		"type":         "bearer",
+	}
+
+	return helpers.SuccessResponse(c, res, "success")
+}
+
 // @Summary Request reset password
 // @Description Request reset password
 // @Tags Auth
