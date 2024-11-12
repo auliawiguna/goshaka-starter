@@ -53,9 +53,11 @@ func main() {
 	defer db.Close()
 
 	// Initiate Redis
-	errRds := appDatabase.RedisConnect()
-	if errRds != nil {
-		panic("cannot start redis connection: " + errRds.Error())
+	if appConfig.GetEnv("REDIS_ACTIVATE") == "true" {
+		errRds := appDatabase.RedisConnect()
+		if errRds != nil {
+			panic("cannot start redis connection: " + errRds.Error())
+		}
 	}
 
 	// Initiate S3 Session

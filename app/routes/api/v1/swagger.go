@@ -3,7 +3,8 @@ package v1
 import (
 	_ "goshaka/docs"
 
-	swagger "github.com/arsmn/fiber-swagger/v2"
+	swagger "github.com/gofiber/swagger"
+
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -1,3 +1,5 @@
+# If we use GVM, GOPATH is "/home/{USERNAME}/go/bin/swag"
+
 build:
 	go build -o server -gcflags=all=-l -ldflags="-w -s" main.go
 

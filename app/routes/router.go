@@ -3,6 +3,8 @@ package routes
 import (
 	routeV1 "goshaka/app/routes/api/v1"
 
+	appConfig "goshaka/configs"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -39,5 +41,8 @@ func ApiRoutes(app *fiber.App) {
 	routeV1.PermissionRoute(apiV1)
 	routeV1.UserRoute(apiV1)
 	routeV1.FilesRoute(apiV1)
-	routeV1.SwaggerRoute(apiV1)
+
+	if appConfig.GetEnv("ENV") == "dev" {
+		routeV1.SwaggerRoute(apiV1)
+	}
 }
